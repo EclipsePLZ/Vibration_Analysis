@@ -166,8 +166,11 @@ namespace Vibration_Analisys2 {
                     referenceFault.Add(Convert.ToSingle(dataGV[referenceFaultHeader.Item2, rowNumber].Value));
                     secondFault.Add(Convert.ToSingle(dataGV[secondFaultHeader.Item2, rowNumber].Value));
                 }
-                MessageBox.Show(referenceFault[0].ToString());
                 step2.Enabled = true;
+
+                numberOfValuesForNormalWorkLevel.Maximum = secondFault.Count;
+                stepControl.SelectTab(step2);
+                
             }
             catch (Exception ex) {
                 MessageBox.Show(ex.Message);
@@ -211,6 +214,17 @@ namespace Vibration_Analisys2 {
         private void ExitButton_Click(object sender, EventArgs e) {
             var exitForm = new ExitForm();
             exitForm.Show();
+        }
+
+        /// <summary>
+        /// For validate value in Text box (only int numbers)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void numberOfValuesForNormalWorkLevel_KeyPress(object sender, KeyPressEventArgs e) {
+            if (e.KeyChar < 48 || e.KeyChar > 57) {
+                e.Handled = true;
+            }
         }
     }
 }
