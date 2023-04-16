@@ -15,21 +15,32 @@ namespace Vibration_Analisys2 {
         /// <summary>
         /// List for reference Fault values
         /// </summary>
-        List<float> referenceFault = new List<float> ();
+        List<double> referenceFault = new List<double> ();
+
+        (string, int) referenceFaultHeader;
 
         /// <summary>
         /// List for second Fault values
         /// </summary>
-        List<float> secondFault = new List<float>();
+        List<double> secondFault = new List<double>();
+
+        (string, int) secondFaultHeader;
 
         string filenameExcel;
         BackgroundWorker worker = new BackgroundWorker();
+
+        /// <summary>
+        /// Max value of signal for normal work for second fault
+        /// </summary>
+        double maxNormalVibraitonSignalLevel;
+
 
         public MainForm() {
             InitializeComponent();
             // Centered Main From on the screen
             this.CenterToScreen();
             step2.Enabled = false;
+            numberOfStdForMaxLevel.Maximum = decimal.MaxValue;
         }
 
         /// <summary>
@@ -44,7 +55,7 @@ namespace Vibration_Analisys2 {
                 ofd.Title = "Choose the file";
                 if (ofd.ShowDialog() == DialogResult.OK) {
                     filenameExcel = ofd.FileName;
-                    worker.ProgressChanged += new ProgressChangedEventHandler(ProgressChanged);
+                    worker.ProgressChanged += new ProgressChangedEventHandler(ProgressExcelLoadChanged);
                     worker.DoWork += new DoWorkEventHandler(LoadData);
                     worker.WorkerReportsProgress = true;
                     dataGV.Size = new Size(682, 370);
@@ -117,7 +128,7 @@ namespace Vibration_Analisys2 {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ProgressChanged(object sender, ProgressChangedEventArgs e) {
+        private void ProgressExcelLoadChanged(object sender, ProgressChangedEventArgs e) {
             if (e.ProgressPercentage > 100) {
                 progressBarDataLoad.Value = 100;
             }
@@ -156,15 +167,15 @@ namespace Vibration_Analisys2 {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void acceptFaultsButton_Click(object sender, EventArgs e) {
-            (string, int) referenceFaultHeader = (referenceFaultBox.Text, referenceFaultBox.SelectedIndex + 1);
-            (string, int) secondFaultHeader = (secondFaultBox.Text, secondFaultBox.SelectedIndex + 1);
+            referenceFaultHeader = (referenceFaultBox.Text, referenceFaultBox.SelectedIndex + 1);
+            secondFaultHeader = (secondFaultBox.Text, secondFaultBox.SelectedIndex + 1);
             referenceFault.Clear();
             secondFault.Clear();
 
             try {
                 for (int rowNumber = 1; rowNumber < dataGV.Rows.Count; rowNumber++) {
-                    referenceFault.Add(Convert.ToSingle(dataGV[referenceFaultHeader.Item2, rowNumber].Value));
-                    secondFault.Add(Convert.ToSingle(dataGV[secondFaultHeader.Item2, rowNumber].Value));
+                    referenceFault.Add((double)dataGV[referenceFaultHeader.Item2, rowNumber].Value);
+                    secondFault.Add((double)dataGV[secondFaultHeader.Item2, rowNumber].Value);
                 }
                 step2.Enabled = true;
 
@@ -222,9 +233,74 @@ namespace Vibration_Analisys2 {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void numberOfValuesForNormalWorkLevel_KeyPress(object sender, KeyPressEventArgs e) {
-            if (e.KeyChar < 48 || e.KeyChar > 57) {
+            if ((e.KeyChar < 48 || e.KeyChar > 57) && e.KeyChar != 8) {
                 e.Handled = true;
             }
+        }
+
+
+        /// <summary>
+        /// Calculation reliability for second fault signal
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void calcReliabilitySignal_Click(object sender, EventArgs e) {
+            int intervalSize = ((int)numberOfValuesForNormalWorkLevel.Value);
+            double stdCount = ((double)numberOfStdForMaxLevel.Value);
+            double meanValueForInterval = secondFault.GetRange(0, intervalSize).Average();
+            double stdValueForInterval = StandardDeviation(secondFault.GetRange(0, intervalSize));
+            maxNormalVibraitonSignalLevel = meanValueForInterval + (double)stdCount * stdValueForInterval;
+
+            meanValueForNormalWork.Text = meanValueForInterval.ToString();
+            stdValueForNormalWork.Text = stdValueForInterval.ToString();
+
+            getReliabilityForSecondSignal();
+        }
+
+        private void getReliabilityForSecondSignal() {
+            dataSignalReliability.ColumnCount = 2;
+            dataSignalReliability[0, 0].Value = secondFaultHeader.Item1;
+            dataSignalReliability[1, 0].Value = "Надежность";
+
+            worker.ProgressChanged += new ProgressChangedEventHandler(ProgressReliabilityChanged);
+            worker.DoWork += new DoWorkEventHandler(getReliability);
+            worker.WorkerReportsProgress = true;
+            dataSignalReliability.Size = new Size(341, 329);
+            progressBarReliability.Visible = true;
+            worker.RunWorkerAsync();
+        }
+
+        private void getReliability(object sender, DoWorkEventArgs e) {
+            double maxSignalLevel = secondFault.Max();
+            int numberOfDivisions = 0;
+
+            double oneDivision = (maxSignalLevel - maxNormalVibraitonSignalLevel) / 99;
+
+            for (int i = 0; i < secondFault.Count; i++) {
+                if (secondFault[i] > maxNormalVibraitonSignalLevel + (numberOfDivisions * oneDivision)) {
+                    numberOfDivisions++;
+                }
+                // Установка значения в DataGridView (вибрация, процент)
+            }
+        }
+
+        private void ProgressReliabilityChanged(object sender, ProgressChangedEventArgs e) {
+            if (e.ProgressPercentage > 100) {
+                progressBarReliability.Value = 100;
+            }
+            else {
+                progressBarReliability.Value = e.ProgressPercentage;
+            }
+        }
+
+        /// <summary>
+        /// Standard deviation
+        /// </summary>
+        /// <param name="values">List of values</param>
+        /// <returns>Value of standard deviation</returns>
+        private double StandardDeviation(IEnumerable<double> values) {
+            double avg = values.Average();
+            return Math.Sqrt(values.Average(v => Math.Pow(v - avg, 2)));
         }
     }
 }

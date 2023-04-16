@@ -39,28 +39,29 @@
             this.progressBarDataLoad = new System.Windows.Forms.ProgressBar();
             this.acceptFaultsButton = new System.Windows.Forms.Button();
             this.step2 = new System.Windows.Forms.TabPage();
-            this.errorProvider1 = new System.Windows.Forms.ErrorProvider(this.components);
-            this.label3 = new System.Windows.Forms.Label();
-            this.numberOfValuesForNormalWorkLevel = new System.Windows.Forms.NumericUpDown();
-            this.label4 = new System.Windows.Forms.Label();
-            this.numberOfStdForMaxLevel = new System.Windows.Forms.NumericUpDown();
-            this.meanValueForNormalWork = new System.Windows.Forms.TextBox();
-            this.label5 = new System.Windows.Forms.Label();
+            this.dataSignalReliability = new System.Windows.Forms.DataGridView();
+            this.calcReliabilitySignal = new System.Windows.Forms.Button();
+            this.maxVibrationSignal = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.stdValueForNormalWork = new System.Windows.Forms.TextBox();
-            this.label7 = new System.Windows.Forms.Label();
-            this.maxVibrationSignal = new System.Windows.Forms.TextBox();
-            this.calcReliabilitySignal = new System.Windows.Forms.Button();
-            this.dataSignalReliability = new System.Windows.Forms.DataGridView();
+            this.label5 = new System.Windows.Forms.Label();
+            this.meanValueForNormalWork = new System.Windows.Forms.TextBox();
+            this.numberOfStdForMaxLevel = new System.Windows.Forms.NumericUpDown();
+            this.label4 = new System.Windows.Forms.Label();
+            this.numberOfValuesForNormalWorkLevel = new System.Windows.Forms.NumericUpDown();
+            this.label3 = new System.Windows.Forms.Label();
+            this.errorProvider1 = new System.Windows.Forms.ErrorProvider(this.components);
+            this.progressBarReliability = new System.Windows.Forms.ProgressBar();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGV)).BeginInit();
             this.stepControl.SuspendLayout();
             this.step1.SuspendLayout();
             this.step2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numberOfValuesForNormalWorkLevel)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numberOfStdForMaxLevel)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataSignalReliability)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numberOfStdForMaxLevel)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numberOfValuesForNormalWorkLevel)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).BeginInit();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -197,6 +198,7 @@
             // 
             // step2
             // 
+            this.step2.Controls.Add(this.progressBarReliability);
             this.step2.Controls.Add(this.dataSignalReliability);
             this.step2.Controls.Add(this.calcReliabilitySignal);
             this.step2.Controls.Add(this.maxVibrationSignal);
@@ -217,18 +219,108 @@
             this.step2.Text = "Шаг 2";
             this.step2.UseVisualStyleBackColor = true;
             // 
-            // errorProvider1
+            // dataSignalReliability
             // 
-            this.errorProvider1.ContainerControl = this;
+            this.dataSignalReliability.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataSignalReliability.Location = new System.Drawing.Point(493, 28);
+            this.dataSignalReliability.Name = "dataSignalReliability";
+            this.dataSignalReliability.Size = new System.Drawing.Size(341, 353);
+            this.dataSignalReliability.TabIndex = 13;
             // 
-            // label3
+            // calcReliabilitySignal
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(28, 28);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(199, 26);
-            this.label3.TabIndex = 2;
-            this.label3.Text = "Количество наблюдений для\r\nподсчета уровня нормальной работы:";
+            this.calcReliabilitySignal.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.calcReliabilitySignal.Location = new System.Drawing.Point(116, 337);
+            this.calcReliabilitySignal.Name = "calcReliabilitySignal";
+            this.calcReliabilitySignal.Size = new System.Drawing.Size(111, 44);
+            this.calcReliabilitySignal.TabIndex = 12;
+            this.calcReliabilitySignal.Text = "Рассчитать";
+            this.calcReliabilitySignal.UseVisualStyleBackColor = true;
+            this.calcReliabilitySignal.Click += new System.EventHandler(this.calcReliabilitySignal_Click);
+            // 
+            // maxVibrationSignal
+            // 
+            this.maxVibrationSignal.Location = new System.Drawing.Point(214, 280);
+            this.maxVibrationSignal.Name = "maxVibrationSignal";
+            this.maxVibrationSignal.ReadOnly = true;
+            this.maxVibrationSignal.Size = new System.Drawing.Size(100, 20);
+            this.maxVibrationSignal.TabIndex = 11;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(28, 274);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(180, 26);
+            this.label7.TabIndex = 10;
+            this.label7.Text = "Максимальный возможный\r\nвибросигнал нормальной работы:";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(28, 221);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(137, 13);
+            this.label6.TabIndex = 9;
+            this.label6.Text = "Стандартное отклонение:";
+            // 
+            // stdValueForNormalWork
+            // 
+            this.stdValueForNormalWork.Location = new System.Drawing.Point(171, 218);
+            this.stdValueForNormalWork.Name = "stdValueForNormalWork";
+            this.stdValueForNormalWork.ReadOnly = true;
+            this.stdValueForNormalWork.Size = new System.Drawing.Size(100, 20);
+            this.stdValueForNormalWork.TabIndex = 8;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(28, 185);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(103, 13);
+            this.label5.TabIndex = 7;
+            this.label5.Text = "Среднее значение:";
+            // 
+            // meanValueForNormalWork
+            // 
+            this.meanValueForNormalWork.Location = new System.Drawing.Point(171, 182);
+            this.meanValueForNormalWork.Name = "meanValueForNormalWork";
+            this.meanValueForNormalWork.ReadOnly = true;
+            this.meanValueForNormalWork.Size = new System.Drawing.Size(100, 20);
+            this.meanValueForNormalWork.TabIndex = 6;
+            // 
+            // numberOfStdForMaxLevel
+            // 
+            this.numberOfStdForMaxLevel.DecimalPlaces = 1;
+            this.numberOfStdForMaxLevel.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            this.numberOfStdForMaxLevel.Location = new System.Drawing.Point(286, 100);
+            this.numberOfStdForMaxLevel.Maximum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numberOfStdForMaxLevel.Name = "numberOfStdForMaxLevel";
+            this.numberOfStdForMaxLevel.Size = new System.Drawing.Size(120, 20);
+            this.numberOfStdForMaxLevel.TabIndex = 5;
+            this.numberOfStdForMaxLevel.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(28, 94);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(246, 26);
+            this.label4.TabIndex = 4;
+            this.label4.Text = "Количество стандартных отклонения для\r\nподсчета максимального допустимого уровня:" +
+    "";
             // 
             // numberOfValuesForNormalWorkLevel
             // 
@@ -253,107 +345,27 @@
             0});
             this.numberOfValuesForNormalWorkLevel.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.numberOfValuesForNormalWorkLevel_KeyPress);
             // 
-            // label4
+            // label3
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(28, 94);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(246, 26);
-            this.label4.TabIndex = 4;
-            this.label4.Text = "Количество стандартных отклонения для\r\nподсчета максимального допустимого уровня:" +
-    "";
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(28, 28);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(199, 26);
+            this.label3.TabIndex = 2;
+            this.label3.Text = "Количество наблюдений для\r\nподсчета уровня нормальной работы:";
             // 
-            // numberOfStdForMaxLevel
+            // errorProvider1
             // 
-            this.numberOfStdForMaxLevel.DecimalPlaces = 1;
-            this.numberOfStdForMaxLevel.Increment = new decimal(new int[] {
-            5,
-            0,
-            0,
-            65536});
-            this.numberOfStdForMaxLevel.Location = new System.Drawing.Point(286, 100);
-            this.numberOfStdForMaxLevel.Maximum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.numberOfStdForMaxLevel.Name = "numberOfStdForMaxLevel";
-            this.numberOfStdForMaxLevel.Size = new System.Drawing.Size(120, 20);
-            this.numberOfStdForMaxLevel.TabIndex = 5;
-            this.numberOfStdForMaxLevel.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
+            this.errorProvider1.ContainerControl = this;
             // 
-            // meanValueForNormalWork
+            // progressBarReliability
             // 
-            this.meanValueForNormalWork.Location = new System.Drawing.Point(171, 182);
-            this.meanValueForNormalWork.Name = "meanValueForNormalWork";
-            this.meanValueForNormalWork.ReadOnly = true;
-            this.meanValueForNormalWork.Size = new System.Drawing.Size(100, 20);
-            this.meanValueForNormalWork.TabIndex = 6;
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(28, 185);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(103, 13);
-            this.label5.TabIndex = 7;
-            this.label5.Text = "Среднее значение:";
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(28, 221);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(137, 13);
-            this.label6.TabIndex = 9;
-            this.label6.Text = "Стандартное отклонение:";
-            // 
-            // stdValueForNormalWork
-            // 
-            this.stdValueForNormalWork.Location = new System.Drawing.Point(171, 218);
-            this.stdValueForNormalWork.Name = "stdValueForNormalWork";
-            this.stdValueForNormalWork.ReadOnly = true;
-            this.stdValueForNormalWork.Size = new System.Drawing.Size(100, 20);
-            this.stdValueForNormalWork.TabIndex = 8;
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(28, 274);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(180, 26);
-            this.label7.TabIndex = 10;
-            this.label7.Text = "Максимальный возможный\r\nвибросигнал нормальной работы:";
-            // 
-            // maxVibrationSignal
-            // 
-            this.maxVibrationSignal.Location = new System.Drawing.Point(214, 280);
-            this.maxVibrationSignal.Name = "maxVibrationSignal";
-            this.maxVibrationSignal.ReadOnly = true;
-            this.maxVibrationSignal.Size = new System.Drawing.Size(100, 20);
-            this.maxVibrationSignal.TabIndex = 11;
-            // 
-            // calcReliabilitySignal
-            // 
-            this.calcReliabilitySignal.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.calcReliabilitySignal.Location = new System.Drawing.Point(116, 337);
-            this.calcReliabilitySignal.Name = "calcReliabilitySignal";
-            this.calcReliabilitySignal.Size = new System.Drawing.Size(111, 44);
-            this.calcReliabilitySignal.TabIndex = 12;
-            this.calcReliabilitySignal.Text = "Рассчитать";
-            this.calcReliabilitySignal.UseVisualStyleBackColor = true;
-            // 
-            // dataSignalReliability
-            // 
-            this.dataSignalReliability.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataSignalReliability.Location = new System.Drawing.Point(493, 28);
-            this.dataSignalReliability.Name = "dataSignalReliability";
-            this.dataSignalReliability.Size = new System.Drawing.Size(341, 353);
-            this.dataSignalReliability.TabIndex = 13;
+            this.progressBarReliability.Location = new System.Drawing.Point(493, 362);
+            this.progressBarReliability.Margin = new System.Windows.Forms.Padding(2);
+            this.progressBarReliability.Name = "progressBarReliability";
+            this.progressBarReliability.Size = new System.Drawing.Size(341, 19);
+            this.progressBarReliability.TabIndex = 14;
+            this.progressBarReliability.Visible = false;
             // 
             // MainForm
             // 
@@ -376,10 +388,10 @@
             this.step1.PerformLayout();
             this.step2.ResumeLayout(false);
             this.step2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numberOfValuesForNormalWorkLevel)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numberOfStdForMaxLevel)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataSignalReliability)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numberOfStdForMaxLevel)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numberOfValuesForNormalWorkLevel)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -414,6 +426,7 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button calcReliabilitySignal;
         private System.Windows.Forms.DataGridView dataSignalReliability;
+        private System.Windows.Forms.ProgressBar progressBarReliability;
     }
 }
 
