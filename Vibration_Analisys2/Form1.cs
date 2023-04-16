@@ -25,15 +25,18 @@ namespace Vibration_Analisys2 {
         string filenameExcel;
         BackgroundWorker worker = new BackgroundWorker();
 
-
         public MainForm() {
             InitializeComponent();
+            // Centered Main From on the screen
             this.CenterToScreen();
             step2.Enabled = false;
         }
 
-        
-
+        /// <summary>
+        /// Open Excel File with Vibration Data
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void openExcelFile_Click(object sender, EventArgs e) {
            
             using (OpenFileDialog ofd = new OpenFileDialog()) {
@@ -51,6 +54,11 @@ namespace Vibration_Analisys2 {
             }
         }
 
+        /// <summary>
+        /// Load data from excel file to DataGridView
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void LoadData(object sender, DoWorkEventArgs e) {
             Microsoft.Office.Interop.Excel.Application xlapp = new Microsoft.Office.Interop.Excel.Application();
             Microsoft.Office.Interop.Excel.Workbook workbook = xlapp.Workbooks.Open(filenameExcel);
@@ -104,6 +112,11 @@ namespace Vibration_Analisys2 {
             dataGV.Invoke(new Action<Size>((size) => dataGV.Size = size), new Size(682, 395));
         }
 
+        /// <summary>
+        /// Change progress bar value
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ProgressChanged(object sender, ProgressChangedEventArgs e) {
             if (e.ProgressPercentage > 100) {
                 progressBarDataLoad.Value = 100;
@@ -113,18 +126,35 @@ namespace Vibration_Analisys2 {
             }
         }
 
+        /// <summary>
+        /// Add values to reference fault comboBox
+        /// </summary>
+        /// <param name="headers">List of headers</param>
         private void AddHeadersInReferenceFaultBox(List<string> headers) {
             referenceFaultBox.Items.AddRange(headers.ToArray());
         }
 
+        /// <summary>
+        /// Add values to second fault comboBox
+        /// </summary>
+        /// <param name="headers">List of headers</param>
         private void AddHeadersInSecondFaultBox(List<string> headers) {
             secondFaultBox.Items.AddRange(headers.ToArray());
         }
 
+        /// <summary>
+        /// Add row to dataGridView
+        /// </summary>
+        /// <param name="nums">List of values</param>
         private void AddRowFunc(List<string> nums) {
             dataGV.Rows.Add(nums.ToArray());
         }
 
+        /// <summary>
+        /// Select reference fault and second fault
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void acceptFaultsButton_Click(object sender, EventArgs e) {
             (string, int) referenceFaultHeader = (referenceFaultBox.Text, referenceFaultBox.SelectedIndex + 1);
             (string, int) secondFaultHeader = (secondFaultBox.Text, secondFaultBox.SelectedIndex + 1);
@@ -152,8 +182,11 @@ namespace Vibration_Analisys2 {
             CheckAcceptButtonRule();
         }
 
+        /// <summary>
+        /// Check rules for accepting fault button
+        /// </summary>
         private void CheckAcceptButtonRule() {
-            if (IsFaultBoxesAceptable()) {
+            if (IsFaultBoxesAcceptable()) {
                 acceptFaultsButton.Enabled = true;
             }
             else {
@@ -161,11 +194,20 @@ namespace Vibration_Analisys2 {
             }
         }
 
-        private bool IsFaultBoxesAceptable() {
+        /// <summary>
+        /// Rule for fault box acceptable
+        /// </summary>
+        /// <returns></returns>
+        private bool IsFaultBoxesAcceptable() {
             return (referenceFaultBox.Text != secondFaultBox.Text) && 
                 (referenceFaultBox.Text != "") && (secondFaultBox.Text != "");
         }
 
+        /// <summary>
+        /// Exit application
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ExitButton_Click(object sender, EventArgs e) {
             var exitForm = new ExitForm();
             exitForm.Show();
