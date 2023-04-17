@@ -53,6 +53,8 @@
             this.label3 = new System.Windows.Forms.Label();
             this.errorProvider1 = new System.Windows.Forms.ErrorProvider(this.components);
             this.progressBarReliability = new System.Windows.Forms.ProgressBar();
+            this.label8 = new System.Windows.Forms.Label();
+            this.faultSignal = new System.Windows.Forms.TextBox();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGV)).BeginInit();
             this.stepControl.SuspendLayout();
@@ -198,6 +200,8 @@
             // 
             // step2
             // 
+            this.step2.Controls.Add(this.label8);
+            this.step2.Controls.Add(this.faultSignal);
             this.step2.Controls.Add(this.progressBarReliability);
             this.step2.Controls.Add(this.dataSignalReliability);
             this.step2.Controls.Add(this.calcReliabilitySignal);
@@ -240,7 +244,7 @@
             // 
             // maxVibrationSignal
             // 
-            this.maxVibrationSignal.Location = new System.Drawing.Point(214, 280);
+            this.maxVibrationSignal.Location = new System.Drawing.Point(214, 291);
             this.maxVibrationSignal.Name = "maxVibrationSignal";
             this.maxVibrationSignal.ReadOnly = true;
             this.maxVibrationSignal.Size = new System.Drawing.Size(100, 20);
@@ -249,7 +253,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(28, 274);
+            this.label7.Location = new System.Drawing.Point(28, 285);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(180, 26);
             this.label7.TabIndex = 10;
@@ -258,7 +262,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(28, 221);
+            this.label6.Location = new System.Drawing.Point(31, 193);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(137, 13);
             this.label6.TabIndex = 9;
@@ -266,7 +270,7 @@
             // 
             // stdValueForNormalWork
             // 
-            this.stdValueForNormalWork.Location = new System.Drawing.Point(171, 218);
+            this.stdValueForNormalWork.Location = new System.Drawing.Point(174, 190);
             this.stdValueForNormalWork.Name = "stdValueForNormalWork";
             this.stdValueForNormalWork.ReadOnly = true;
             this.stdValueForNormalWork.Size = new System.Drawing.Size(100, 20);
@@ -275,7 +279,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(28, 185);
+            this.label5.Location = new System.Drawing.Point(31, 157);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(103, 13);
             this.label5.TabIndex = 7;
@@ -283,7 +287,7 @@
             // 
             // meanValueForNormalWork
             // 
-            this.meanValueForNormalWork.Location = new System.Drawing.Point(171, 182);
+            this.meanValueForNormalWork.Location = new System.Drawing.Point(174, 154);
             this.meanValueForNormalWork.Name = "meanValueForNormalWork";
             this.meanValueForNormalWork.ReadOnly = true;
             this.meanValueForNormalWork.Size = new System.Drawing.Size(100, 20);
@@ -367,6 +371,23 @@
             this.progressBarReliability.TabIndex = 14;
             this.progressBarReliability.Visible = false;
             // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(31, 226);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(134, 26);
+            this.label8.TabIndex = 16;
+            this.label8.Text = "Максимальное значение\r\nсигнала:";
+            // 
+            // faultSignal
+            // 
+            this.faultSignal.Location = new System.Drawing.Point(174, 232);
+            this.faultSignal.Name = "faultSignal";
+            this.faultSignal.ReadOnly = true;
+            this.faultSignal.Size = new System.Drawing.Size(100, 20);
+            this.faultSignal.TabIndex = 15;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -427,6 +448,8 @@
         private System.Windows.Forms.Button calcReliabilitySignal;
         private System.Windows.Forms.DataGridView dataSignalReliability;
         private System.Windows.Forms.ProgressBar progressBarReliability;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.TextBox faultSignal;
     }
 }
 

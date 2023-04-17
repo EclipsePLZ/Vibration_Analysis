@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using Microsoft.Office.Interop.Excel;
 
 namespace Vibration_Analisys2 {
     public partial class MainForm : Form {
@@ -28,6 +29,7 @@ namespace Vibration_Analisys2 {
 
         string filenameExcel;
         BackgroundWorker worker = new BackgroundWorker();
+        BackgroundWorker worker2 = new BackgroundWorker();
 
         /// <summary>
         /// Max value of signal for normal work for second fault
@@ -174,8 +176,8 @@ namespace Vibration_Analisys2 {
 
             try {
                 for (int rowNumber = 1; rowNumber < dataGV.Rows.Count; rowNumber++) {
-                    referenceFault.Add((double)dataGV[referenceFaultHeader.Item2, rowNumber].Value);
-                    secondFault.Add((double)dataGV[secondFaultHeader.Item2, rowNumber].Value);
+                    referenceFault.Add(Convert.ToDouble(dataGV[referenceFaultHeader.Item2, rowNumber].Value));
+                    secondFault.Add(Convert.ToDouble(dataGV[secondFaultHeader.Item2, rowNumber].Value));
                 }
                 step2.Enabled = true;
 
@@ -250,40 +252,87 @@ namespace Vibration_Analisys2 {
             double meanValueForInterval = secondFault.GetRange(0, intervalSize).Average();
             double stdValueForInterval = StandardDeviation(secondFault.GetRange(0, intervalSize));
             maxNormalVibraitonSignalLevel = meanValueForInterval + (double)stdCount * stdValueForInterval;
-
+            
             meanValueForNormalWork.Text = meanValueForInterval.ToString();
             stdValueForNormalWork.Text = stdValueForInterval.ToString();
+            faultSignal.Text = secondFault.Max().ToString();
+            maxVibrationSignal.Text = maxNormalVibraitonSignalLevel.ToString();
 
             getReliabilityForSecondSignal();
         }
 
+        /// <summary>
+        /// Calculation reliability with backgroung worker
+        /// </summary>
         private void getReliabilityForSecondSignal() {
             dataSignalReliability.ColumnCount = 2;
-            dataSignalReliability[0, 0].Value = secondFaultHeader.Item1;
-            dataSignalReliability[1, 0].Value = "Надежность";
+            dataSignalReliability.Rows.Add(secondFaultHeader.Item1, "Надежность");
 
-            worker.ProgressChanged += new ProgressChangedEventHandler(ProgressReliabilityChanged);
-            worker.DoWork += new DoWorkEventHandler(getReliability);
-            worker.WorkerReportsProgress = true;
+            worker2.ProgressChanged += new ProgressChangedEventHandler(ProgressReliabilityChanged);
+            worker2.DoWork += new DoWorkEventHandler(getReliability);
+            worker2.WorkerReportsProgress = true;
             dataSignalReliability.Size = new Size(341, 329);
             progressBarReliability.Visible = true;
-            worker.RunWorkerAsync();
+            worker2.RunWorkerAsync();
         }
 
+
+        /// <summary>
+        /// Background worker for adding rows to DataGridView
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void getReliability(object sender, DoWorkEventArgs e) {
             double maxSignalLevel = secondFault.Max();
+
             int numberOfDivisions = 0;
 
             double oneDivision = (maxSignalLevel - maxNormalVibraitonSignalLevel) / 99;
 
-            for (int i = 0; i < secondFault.Count; i++) {
-                if (secondFault[i] > maxNormalVibraitonSignalLevel + (numberOfDivisions * oneDivision)) {
-                    numberOfDivisions++;
-                }
-                // Установка значения в DataGridView (вибрация, процент)
+            int progress = 0;
+            int step = secondFault.Count / 100;
+            int oneBarInProgress = 1;
+            if (secondFault.Count < 100) {
+                step = 1;
+                oneBarInProgress = (100 / secondFault.Count) + 1;
             }
+            worker2.ReportProgress(progress);
+
+            double prevBiggestSignal = maxNormalVibraitonSignalLevel;
+
+            for (int i = 0; i < secondFault.Count; i++) {
+
+                if (i % step == 0) {
+                    progress += oneBarInProgress;
+                    worker2.ReportProgress(progress);
+                }
+
+                if (secondFault[i] > prevBiggestSignal) {
+                    prevBiggestSignal = secondFault[i];
+                    numberOfDivisions = (int)((secondFault[i] - (maxNormalVibraitonSignalLevel)) / oneDivision) + 1;
+                }
+
+                dataSignalReliability.Invoke(new Action<(double, int)>((s) => AddValuePercent(s)), (secondFault[i], numberOfDivisions));
+            }
+
+            progressBarReliability.Invoke(new Action<bool>((b) => progressBarReliability.Visible = b), false);
+
+            dataSignalReliability.Invoke(new Action<Size>((size) => dataSignalReliability.Size = size), new Size(341, 353));
         }
 
+        /// <summary>
+        /// Add row to dataGridView with percent of reliability
+        /// </summary>
+        /// <param name="values">value and percent of reliability</param>
+        private void AddValuePercent((double, int) values) {
+            dataSignalReliability.Rows.Add(values.Item1, values.Item2.ToString() + "%");
+        }
+
+        /// <summary>
+        /// Change progress bar value for reliability bar
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ProgressReliabilityChanged(object sender, ProgressChangedEventArgs e) {
             if (e.ProgressPercentage > 100) {
                 progressBarReliability.Value = 100;
