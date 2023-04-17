@@ -1,14 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.IO;
-using Microsoft.Office.Interop.Excel;
 
 namespace Vibration_Analisys2 {
     public partial class MainForm : Form {
@@ -17,6 +12,7 @@ namespace Vibration_Analisys2 {
         /// List for reference Fault values
         /// </summary>
         List<double> referenceFault = new List<double> ();
+        List<double> selectIntervalRefFault = new List<double>();
 
         (string, int) referenceFaultHeader;
 
@@ -24,12 +20,18 @@ namespace Vibration_Analisys2 {
         /// List for second Fault values
         /// </summary>
         List<double> secondFault = new List<double>();
+        List<double> selectIntervalSecFault = new List<double>();
+
+        List<int> percentOfSecondFault = new List<int>();
 
         (string, int) secondFaultHeader;
 
         string filenameExcel;
-        BackgroundWorker worker = new BackgroundWorker();
-        BackgroundWorker worker2 = new BackgroundWorker();
+
+        // BackgroundWorkers for each step
+        BackgroundWorker workerStep1 = new BackgroundWorker();
+        BackgroundWorker workerStep2 = new BackgroundWorker();
+        BackgroundWorker workerStep3 = new BackgroundWorker();
 
         /// <summary>
         /// Max value of signal for normal work for second fault
@@ -42,6 +44,7 @@ namespace Vibration_Analisys2 {
             // Centered Main From on the screen
             this.CenterToScreen();
             step2.Enabled = false;
+            step3.Enabled = false;
             numberOfStdForMaxLevel.Maximum = decimal.MaxValue;
         }
 
@@ -57,12 +60,12 @@ namespace Vibration_Analisys2 {
                 ofd.Title = "Choose the file";
                 if (ofd.ShowDialog() == DialogResult.OK) {
                     filenameExcel = ofd.FileName;
-                    worker.ProgressChanged += new ProgressChangedEventHandler(ProgressExcelLoadChanged);
-                    worker.DoWork += new DoWorkEventHandler(LoadData);
-                    worker.WorkerReportsProgress = true;
+                    workerStep1.ProgressChanged += new ProgressChangedEventHandler(ProgressExcelLoadChanged);
+                    workerStep1.DoWork += new DoWorkEventHandler(LoadData);
+                    workerStep1.WorkerReportsProgress = true;
                     dataGV.Size = new Size(682, 370);
                     progressBarDataLoad.Visible = true;
-                    worker.RunWorkerAsync();
+                    workerStep1.RunWorkerAsync();
                 }
             }
         }
@@ -89,12 +92,12 @@ namespace Vibration_Analisys2 {
                     step = 1;
                     oneBarInProgress = (100 / range.Rows.Count) + 1;
                 }
-                worker.ReportProgress(progress);
+                workerStep1.ReportProgress(progress);
 
                 for (int row = 1; row <= range.Rows.Count; row++) {
                     if (row % step == 0) {
                         progress += oneBarInProgress;
-                        worker.ReportProgress(progress);
+                        workerStep1.ReportProgress(progress);
                     }
                     List<string> rowValues = new List<string>();
                     for (int col = 1; col <= range.Columns.Count; col++) {
@@ -182,7 +185,7 @@ namespace Vibration_Analisys2 {
                 step2.Enabled = true;
 
                 numberOfValuesForNormalWorkLevel.Maximum = secondFault.Count;
-                stepControl.SelectTab(step2);
+                allSteps.SelectTab(step2);
                 
             }
             catch (Exception ex) {
@@ -235,9 +238,16 @@ namespace Vibration_Analisys2 {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void numberOfValuesForNormalWorkLevel_KeyPress(object sender, KeyPressEventArgs e) {
-            if ((e.KeyChar < 48 || e.KeyChar > 57) && e.KeyChar != 8) {
-                e.Handled = true;
-            }
+            e.Handled = CheckNumericIntValue(e);
+        }
+
+        /// <summary>
+        /// Check if pressed numeric or backspace
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        private bool CheckNumericIntValue(KeyPressEventArgs e) {
+            return (e.KeyChar < 48 || e.KeyChar > 57) && e.KeyChar != 8;
         }
 
 
@@ -259,26 +269,28 @@ namespace Vibration_Analisys2 {
             maxVibrationSignal.Text = maxNormalVibraitonSignalLevel.ToString();
 
             getReliabilityForSecondSignal();
+            numericPieceOfRefFault.Maximum = referenceFault.Count();
+            step3.Enabled = true;
         }
 
         /// <summary>
-        /// Calculation reliability with backgroung worker
+        /// Calculation reliability with backgroung workerStep1
         /// </summary>
         private void getReliabilityForSecondSignal() {
             dataSignalReliability.ColumnCount = 2;
             dataSignalReliability.Rows.Add(secondFaultHeader.Item1, "Надежность");
 
-            worker2.ProgressChanged += new ProgressChangedEventHandler(ProgressReliabilityChanged);
-            worker2.DoWork += new DoWorkEventHandler(getReliability);
-            worker2.WorkerReportsProgress = true;
+            workerStep2.ProgressChanged += new ProgressChangedEventHandler(ProgressReliabilityChanged);
+            workerStep2.DoWork += new DoWorkEventHandler(getReliability);
+            workerStep2.WorkerReportsProgress = true;
             dataSignalReliability.Size = new Size(341, 329);
             progressBarReliability.Visible = true;
-            worker2.RunWorkerAsync();
+            workerStep2.RunWorkerAsync();
         }
 
 
         /// <summary>
-        /// Background worker for adding rows to DataGridView
+        /// Background workerStep1 for adding rows to DataGridView
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -296,7 +308,7 @@ namespace Vibration_Analisys2 {
                 step = 1;
                 oneBarInProgress = (100 / secondFault.Count) + 1;
             }
-            worker2.ReportProgress(progress);
+            workerStep2.ReportProgress(progress);
 
             double prevBiggestSignal = maxNormalVibraitonSignalLevel;
 
@@ -304,7 +316,7 @@ namespace Vibration_Analisys2 {
 
                 if (i % step == 0) {
                     progress += oneBarInProgress;
-                    worker2.ReportProgress(progress);
+                    workerStep2.ReportProgress(progress);
                 }
 
                 if (secondFault[i] > prevBiggestSignal) {
@@ -326,6 +338,7 @@ namespace Vibration_Analisys2 {
         /// <param name="values">value and percent of reliability</param>
         private void AddValuePercent((double, int) values) {
             int reliability = 100 - values.Item2;
+            percentOfSecondFault.Add(reliability);
             dataSignalReliability.Rows.Add(values.Item1, reliability.ToString() + "%");
         }
 
@@ -351,6 +364,114 @@ namespace Vibration_Analisys2 {
         private double StandardDeviation(IEnumerable<double> values) {
             double avg = values.Average();
             return Math.Sqrt(values.Average(v => Math.Pow(v - avg, 2)));
+        }
+
+        /// <summary>
+        /// Find the most correlated sections of accidents
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void maxPearsonCoefTwoFaultsButton_Click(object sender, EventArgs e) {
+            int numberOfValuesInFault = (int)numericPieceOfRefFault.Value;
+
+            selectIntervalRefFault = new List<double>(referenceFault.GetRange(0, numberOfValuesInFault));
+            double bestCorrCoef = 0;
+            int bestStartIndexSecFault = 0;
+
+            var application = new Microsoft.Office.Interop.Excel.Application();
+
+            for (int i = 0; i < (secondFault.Count - numberOfValuesInFault); i++) {
+                double corrCoef = CorrelCoef(selectIntervalRefFault, secondFault.GetRange(i, numberOfValuesInFault), application);
+                if (Math.Abs(corrCoef) > Math.Abs(bestCorrCoef)) {
+                    bestCorrCoef = corrCoef;
+                    bestStartIndexSecFault = i;
+                }
+            }
+            application.Quit();
+
+            bestCorrelCoefTextBox.Text = bestCorrCoef.ToString();
+            bestIndexSecFaultTextBox.Text = bestStartIndexSecFault.ToString();
+
+            selectIntervalSecFault = new List<double>(secondFault.GetRange(bestStartIndexSecFault, numberOfValuesInFault));
+
+            WriteBestIntervalsIntoDataGridView();
+        }
+
+        /// <summary>
+        /// Get correlation coefficient (Pearson coefficient)
+        /// </summary>
+        /// <param name="list1">First list of values</param>
+        /// <param name="list2">Second list of values</param>
+        /// <param name="app">Excel application</param>
+        /// <returns>Value of Correlation coefficient</returns>
+        private double CorrelCoef(IEnumerable<double> list1, IEnumerable<double> list2, Microsoft.Office.Interop.Excel.Application app) {
+            return app.WorksheetFunction.Correl(list1.ToArray(), list2.ToArray());
+        }
+
+        /// <summary>
+        /// Function for writing best intervals into data grid view with background worker
+        /// </summary>
+        private void WriteBestIntervalsIntoDataGridView() {
+            dataGVbestIntervalsOfFault.ColumnCount = 2;
+            dataGVbestIntervalsOfFault.Rows.Add(referenceFaultHeader.Item1, secondFaultHeader.Item1);
+
+            workerStep3.ProgressChanged += new ProgressChangedEventHandler(ProgressSelectIntervalChanged);
+            workerStep3.DoWork += new DoWorkEventHandler(WriteBestIntervalsToDataGridAsync);
+            workerStep3.WorkerReportsProgress = true;
+            dataGVbestIntervalsOfFault.Size = new Size(341, 329);
+            progressBarSelectedInterval.Visible = true;
+            workerStep3.RunWorkerAsync();
+        }
+
+        /// <summary>
+        /// Change progress bar value for select interval bar
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ProgressSelectIntervalChanged(object sender, ProgressChangedEventArgs e) {
+            if (e.ProgressPercentage > 100) {
+                progressBarSelectedInterval.Value = 100;
+            }
+            else {
+                progressBarSelectedInterval.Value = e.ProgressPercentage;
+            }
+        }
+
+        /// <summary>
+        /// Write value of selected intervals to dataGridView
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void WriteBestIntervalsToDataGridAsync(object sender, DoWorkEventArgs e) {
+            int progress = 0;
+            int step = selectIntervalRefFault.Count / 100;
+            int oneBarInProgress = 1;
+            if (selectIntervalRefFault.Count < 100) {
+                step = 1;
+                oneBarInProgress = (100 / selectIntervalRefFault.Count) + 1;
+            }
+            workerStep3.ReportProgress(progress);
+
+            for (int i = 0; i < selectIntervalRefFault.Count; i++) {
+                if (i % step == 0) {
+                    progress += oneBarInProgress;
+                    workerStep3.ReportProgress(progress);
+                }
+
+                (double, double) newRow = (selectIntervalRefFault[i], selectIntervalSecFault[i]);
+                dataGVbestIntervalsOfFault.Invoke(new Action<(double, double)>((values) => WriteRowOfBestInterval(values)), newRow);
+            }
+
+            progressBarSelectedInterval.Invoke(new Action<bool>((b) => progressBarSelectedInterval.Visible = b), false);
+            dataGVbestIntervalsOfFault.Invoke(new Action<Size>((size) => dataGVbestIntervalsOfFault.Size = size), new Size(341, 353));
+        }
+
+        /// <summary>
+        /// Write new row of best intervals to dataDV
+        /// </summary>
+        /// <param name="values">Tuple of two elements: reference fault and second fault</param>
+        private void WriteRowOfBestInterval((double, double) values) {
+            dataGVbestIntervalsOfFault.Rows.Add(values.Item1, values.Item2);
         }
     }
 }
