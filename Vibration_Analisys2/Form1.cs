@@ -325,7 +325,8 @@ namespace Vibration_Analisys2 {
         /// </summary>
         /// <param name="values">value and percent of reliability</param>
         private void AddValuePercent((double, int) values) {
-            dataSignalReliability.Rows.Add(values.Item1, values.Item2.ToString() + "%");
+            int reliability = 100 - values.Item2;
+            dataSignalReliability.Rows.Add(values.Item1, reliability.ToString() + "%");
         }
 
         /// <summary>
