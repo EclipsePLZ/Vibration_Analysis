@@ -58,7 +58,8 @@ namespace Vibration_Analisys2 {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void openExcelFile_Click(object sender, EventArgs e) {
-            ClearAllTabControls();
+            ClearControlsStep1();
+            allSteps.SelectTab(step1);
 
             // Open xlsx file dialog
             using (OpenFileDialog ofd = new OpenFileDialog()) {
@@ -72,6 +73,7 @@ namespace Vibration_Analisys2 {
                     workerStep1.DoWork += new DoWorkEventHandler(LoadData);
                     workerStep1.WorkerReportsProgress = true;
                     dataGV.Size = new Size(682, 370);
+                    progressBarDataLoad.Value = 0;
                     progressBarDataLoad.Visible = true;
                     workerStep1.RunWorkerAsync();
                 }
@@ -95,6 +97,7 @@ namespace Vibration_Analisys2 {
             dataGV.Refresh();
             referenceFaultBox.Items.Clear();
             secondFaultBox.Items.Clear();
+            ClearControlsStep2();
         }
 
         /// <summary>
@@ -109,6 +112,7 @@ namespace Vibration_Analisys2 {
             maxVibrationSignal.Text = "";
             dataSignalReliability.Rows.Clear();
             dataSignalReliability.Refresh();
+            ClearControlsStep3();
         }
 
         /// <summary>
@@ -183,6 +187,7 @@ namespace Vibration_Analisys2 {
             progressBarDataLoad.Invoke(new Action<bool>((b) => progressBarDataLoad.Visible = b), false);
 
             dataGV.Invoke(new Action<Size>((size) => dataGV.Size = size), new Size(682, 395));
+            workerStep1.DoWork -= new DoWorkEventHandler(LoadData);
         }
 
         /// <summary>
@@ -355,6 +360,7 @@ namespace Vibration_Analisys2 {
             workerStep2.DoWork += new DoWorkEventHandler(getReliability);
             workerStep2.WorkerReportsProgress = true;
             dataSignalReliability.Size = new Size(341, 329);
+            progressBarReliability.Value = 0;
             progressBarReliability.Visible = true;
             workerStep2.RunWorkerAsync();
         }
@@ -401,6 +407,7 @@ namespace Vibration_Analisys2 {
             progressBarReliability.Invoke(new Action<bool>((b) => progressBarReliability.Visible = b), false);
 
             dataSignalReliability.Invoke(new Action<Size>((size) => dataSignalReliability.Size = size), new Size(341, 353));
+            workerStep2.DoWork -= new DoWorkEventHandler(getReliability);
         }
 
         /// <summary>
@@ -463,7 +470,8 @@ namespace Vibration_Analisys2 {
             bestCorrelCoefTextBox.Text = bestCorrCoef.ToString();
             bestIndexSecFaultTextBox.Text = bestStartIndexSecFault.ToString();
 
-            selectIntervalSecFault = new List<double>(secondFault.GetRange(bestStartIndexSecFault, numberOfValuesInFault));
+            selectIntervalRefFault = new List<double>(referenceFault.GetRange(0, secondFault.Count - bestStartIndexSecFault));
+            selectIntervalSecFault = new List<double>(secondFault.GetRange(bestStartIndexSecFault, secondFault.Count - bestStartIndexSecFault));
 
             MessageBox.Show(selectIntervalRefFault.Count.ToString());
             MessageBox.Show(selectIntervalSecFault.Count.ToString());
@@ -494,6 +502,7 @@ namespace Vibration_Analisys2 {
             workerStep3.DoWork += new DoWorkEventHandler(WriteBestIntervalsToDataGridAsync);
             workerStep3.WorkerReportsProgress = true;
             dataGVbestIntervalsOfFault.Size = new Size(341, 329);
+            progressBarSelectedInterval.Value = 0;
             progressBarSelectedInterval.Visible = true;
             workerStep3.RunWorkerAsync();
         }
@@ -540,6 +549,8 @@ namespace Vibration_Analisys2 {
 
             progressBarSelectedInterval.Invoke(new Action<bool>((b) => progressBarSelectedInterval.Visible = b), false);
             dataGVbestIntervalsOfFault.Invoke(new Action<Size>((size) => dataGVbestIntervalsOfFault.Size = size), new Size(341, 353));
+
+            workerStep3.DoWork -= new DoWorkEventHandler(WriteBestIntervalsToDataGridAsync);
         }
 
         /// <summary>
