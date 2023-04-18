@@ -66,6 +66,11 @@
             this.progressBarSelectedInterval = new System.Windows.Forms.ProgressBar();
             this.dataGVbestIntervalsOfFault = new System.Windows.Forms.DataGridView();
             this.step4 = new System.Windows.Forms.TabPage();
+            this.label12 = new System.Windows.Forms.Label();
+            this.numberOfValuesInSelectedInterval = new System.Windows.Forms.TextBox();
+            this.numberOfValuesForPolynomes = new System.Windows.Forms.NumericUpDown();
+            this.label13 = new System.Windows.Forms.Label();
+            this.FindPolynomButton = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGV)).BeginInit();
             this.allSteps.SuspendLayout();
@@ -78,6 +83,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericPieceOfRefFault)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGVbestIntervalsOfFault)).BeginInit();
+            this.step4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numberOfValuesForPolynomes)).BeginInit();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -522,12 +529,76 @@
             // 
             // step4
             // 
+            this.step4.Controls.Add(this.FindPolynomButton);
+            this.step4.Controls.Add(this.numberOfValuesForPolynomes);
+            this.step4.Controls.Add(this.label13);
+            this.step4.Controls.Add(this.label12);
+            this.step4.Controls.Add(this.numberOfValuesInSelectedInterval);
             this.step4.Location = new System.Drawing.Point(4, 22);
             this.step4.Name = "step4";
             this.step4.Size = new System.Drawing.Size(879, 406);
             this.step4.TabIndex = 3;
             this.step4.Text = "Шаг 4";
             this.step4.UseVisualStyleBackColor = true;
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(44, 42);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(125, 26);
+            this.label12.TabIndex = 11;
+            this.label12.Text = "Количество значений в\r\nвыбранных авариях:";
+            // 
+            // numberOfValuesInSelectedInterval
+            // 
+            this.numberOfValuesInSelectedInterval.Location = new System.Drawing.Point(199, 48);
+            this.numberOfValuesInSelectedInterval.Name = "numberOfValuesInSelectedInterval";
+            this.numberOfValuesInSelectedInterval.ReadOnly = true;
+            this.numberOfValuesInSelectedInterval.Size = new System.Drawing.Size(100, 20);
+            this.numberOfValuesInSelectedInterval.TabIndex = 10;
+            // 
+            // numberOfValuesForPolynomes
+            // 
+            this.numberOfValuesForPolynomes.Location = new System.Drawing.Point(199, 107);
+            this.numberOfValuesForPolynomes.Maximum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numberOfValuesForPolynomes.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numberOfValuesForPolynomes.Name = "numberOfValuesForPolynomes";
+            this.numberOfValuesForPolynomes.Size = new System.Drawing.Size(120, 20);
+            this.numberOfValuesForPolynomes.TabIndex = 13;
+            this.numberOfValuesForPolynomes.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(44, 101);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(149, 26);
+            this.label13.TabIndex = 12;
+            this.label13.Text = "Количество наблюдений\r\nдля постраения полиномов:";
+            // 
+            // FindPolynomButton
+            // 
+            this.FindPolynomButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.FindPolynomButton.Location = new System.Drawing.Point(88, 268);
+            this.FindPolynomButton.Name = "FindPolynomButton";
+            this.FindPolynomButton.Size = new System.Drawing.Size(154, 59);
+            this.FindPolynomButton.TabIndex = 14;
+            this.FindPolynomButton.Text = "Найти коэффициенты полинома";
+            this.FindPolynomButton.UseVisualStyleBackColor = true;
+            this.FindPolynomButton.Click += new System.EventHandler(this.FindPolynomButton_Click);
             // 
             // MainForm
             // 
@@ -558,6 +629,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericPieceOfRefFault)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGVbestIntervalsOfFault)).EndInit();
+            this.step4.ResumeLayout(false);
+            this.step4.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numberOfValuesForPolynomes)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -606,6 +680,11 @@
         private System.Windows.Forms.ProgressBar progressBarSelectedInterval;
         private System.Windows.Forms.DataGridView dataGVbestIntervalsOfFault;
         private System.Windows.Forms.TabPage step4;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.TextBox numberOfValuesInSelectedInterval;
+        private System.Windows.Forms.NumericUpDown numberOfValuesForPolynomes;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.Button FindPolynomButton;
     }
 }
 

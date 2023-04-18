@@ -81,15 +81,6 @@ namespace Vibration_Analisys2 {
         }
 
         /// <summary>
-        /// Function for clear controls from all tabs
-        /// </summary>
-        private void ClearAllTabControls() {
-            ClearControlsStep1();
-            ClearControlsStep2();
-            ClearControlsStep3();
-        }
-
-        /// <summary>
         /// Function for clear controls from step1
         /// </summary>
         private void ClearControlsStep1() {
@@ -124,6 +115,15 @@ namespace Vibration_Analisys2 {
             bestIndexSecFaultTextBox.Text = "";
             dataGVbestIntervalsOfFault.Rows.Clear();
             dataGVbestIntervalsOfFault.Refresh();
+            ClearControlsStep4();
+        }
+
+        /// <summary>
+        /// Function for clear controls from step4
+        /// </summary>
+        private void ClearControlsStep4() {
+            numberOfValuesInSelectedInterval.Text = "";
+            numberOfValuesForPolynomes.Value = 1;
         }
 
         /// <summary>
@@ -475,6 +475,9 @@ namespace Vibration_Analisys2 {
 
             WriteBestIntervalsIntoDataGridView();
             step4.Enabled = true;
+
+            numberOfValuesInSelectedInterval.Text = selectIntervalSecFault.Count.ToString();
+            numberOfValuesForPolynomes.Maximum = selectIntervalSecFault.Count;
         }
 
         /// <summary>
@@ -557,6 +560,10 @@ namespace Vibration_Analisys2 {
         /// <param name="values">Tuple of two elements: reference fault and second fault</param>
         private void WriteRowOfBestInterval((double, double) values) {
             dataGVbestIntervalsOfFault.Rows.Add(values.Item1, values.Item2);
+        }
+
+        private void FindPolynomButton_Click(object sender, EventArgs e) {
+
         }
     }
 }
