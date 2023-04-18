@@ -43,9 +43,13 @@ namespace Vibration_Analisys2 {
             InitializeComponent();
             // Centered Main From on the screen
             this.CenterToScreen();
-            step2.Enabled = false;
-            step3.Enabled = false;
-            numberOfStdForMaxLevel.Maximum = decimal.MaxValue;
+            foreach (TabPage tab in allSteps.TabPages){
+                tab.Enabled = false;
+            }
+            step1.Enabled = true;
+            //step2.Enabled = false;
+            //step3.Enabled = false;
+            //numberOfStdForMaxLevel.Maximum = decimal.MaxValue;
         }
 
         /// <summary>
@@ -54,7 +58,9 @@ namespace Vibration_Analisys2 {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void openExcelFile_Click(object sender, EventArgs e) {
-           
+            ClearRenameControls();
+
+            // Open xlsx file dialog
             using (OpenFileDialog ofd = new OpenFileDialog()) {
                 ofd.Filter = "Excel Files Only | *.xlsx; *.xls";
                 ofd.Title = "Choose the file";
@@ -68,6 +74,37 @@ namespace Vibration_Analisys2 {
                     workerStep1.RunWorkerAsync();
                 }
             }
+        }
+
+        private void ClearRenameControls() {
+            ClearControlsStep1();
+            ClearControlsStep2();
+            ClearControlsStep3();
+        }
+
+        private void ClearControlsStep1() {
+            dataGV.Rows.Clear();
+            dataGV.Refresh();
+            referenceFaultBox.Items.Clear();
+            secondFaultBox.Items.Clear();
+        }
+        private void ClearControlsStep2() {
+            numberOfValuesForNormalWorkLevel.Value = 1;
+            numberOfStdForMaxLevel.Value = 1;
+            meanValueForNormalWork.Text = "";
+            stdValueForNormalWork.Text = "";
+            faultSignal.Text = "";
+            maxVibrationSignal.Text = "";
+            dataSignalReliability.Rows.Clear();
+            dataSignalReliability.Refresh();
+        }
+
+        private void ClearControlsStep3() {
+            numericPieceOfRefFault.Value = 1;
+            bestCorrelCoefTextBox.Text = "";
+            bestIndexSecFaultTextBox.Text = "";
+            dataGVbestIntervalsOfFault.Rows.Clear();
+            dataGVbestIntervalsOfFault.Refresh();
         }
 
         /// <summary>
@@ -185,6 +222,7 @@ namespace Vibration_Analisys2 {
                 step2.Enabled = true;
 
                 numberOfValuesForNormalWorkLevel.Maximum = secondFault.Count;
+                numberOfStdForMaxLevel.Maximum = decimal.MaxValue;
                 allSteps.SelectTab(step2);
                 
             }

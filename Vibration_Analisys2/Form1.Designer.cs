@@ -103,7 +103,7 @@
             // openExcelFile
             // 
             this.openExcelFile.Name = "openExcelFile";
-            this.openExcelFile.Size = new System.Drawing.Size(121, 22);
+            this.openExcelFile.Size = new System.Drawing.Size(180, 22);
             this.openExcelFile.Text = "Открыть";
             this.openExcelFile.Click += new System.EventHandler(this.openExcelFile_Click);
             // 
@@ -204,9 +204,10 @@
             // acceptFaultsButton
             // 
             this.acceptFaultsButton.Enabled = false;
-            this.acceptFaultsButton.Location = new System.Drawing.Point(739, 290);
+            this.acceptFaultsButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.acceptFaultsButton.Location = new System.Drawing.Point(731, 290);
             this.acceptFaultsButton.Name = "acceptFaultsButton";
-            this.acceptFaultsButton.Size = new System.Drawing.Size(102, 40);
+            this.acceptFaultsButton.Size = new System.Drawing.Size(110, 48);
             this.acceptFaultsButton.TabIndex = 6;
             this.acceptFaultsButton.Text = "Подтвердить";
             this.acceptFaultsButton.UseVisualStyleBackColor = true;
@@ -274,7 +275,7 @@
             // 
             // calcReliabilitySignal
             // 
-            this.calcReliabilitySignal.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.calcReliabilitySignal.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.calcReliabilitySignal.Location = new System.Drawing.Point(116, 337);
             this.calcReliabilitySignal.Name = "calcReliabilitySignal";
             this.calcReliabilitySignal.Size = new System.Drawing.Size(111, 44);
