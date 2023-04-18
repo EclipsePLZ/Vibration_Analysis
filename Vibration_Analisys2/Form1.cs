@@ -32,6 +32,7 @@ namespace Vibration_Analisys2 {
         BackgroundWorker workerStep1 = new BackgroundWorker();
         BackgroundWorker workerStep2 = new BackgroundWorker();
         BackgroundWorker workerStep3 = new BackgroundWorker();
+        BackgroundWorker workerStep4 = new BackgroundWorker();
 
         /// <summary>
         /// Max value of signal for normal work for second fault
@@ -124,6 +125,8 @@ namespace Vibration_Analisys2 {
         private void ClearControlsStep4() {
             numberOfValuesInSelectedInterval.Text = "";
             numberOfValuesForPolynomes.Value = 1;
+            dataGVBestPoly.Rows.Clear();
+            dataGVBestPoly.Refresh();
         }
 
         /// <summary>
@@ -563,7 +566,86 @@ namespace Vibration_Analisys2 {
         }
 
         private void FindPolynomButton_Click(object sender, EventArgs e) {
+            dataGVBestPoly.ColumnCount = 3;
+            dataGVBestPoly.Rows.Add("Степень полинома", "Коэффициент детерминации", "Уравнение");
 
+            // Run background worker for finding polynom coeffs
+            workerStep4.ProgressChanged += ProgressFindBestPolyChanged;
+            workerStep4.DoWork += FindBestPolynom;
+            workerStep4.WorkerReportsProgress = true;
+            dataGVBestPoly.Size = new Size(553, 405);
+            progressBestPoly.Value = 0;
+            progressBestPoly.Visible = true;
+            workerStep4.RunWorkerAsync();
+            // Доделать 4 шаг
+
+            //int numberValuesForPolynom = (int)numberOfValuesForPolynomes.Value;
+            //int polynomialDegree = 1;
+            //selectIntervalRefFault = new List<double>(selectIntervalRefFault.GetRange(0, numberValuesForPolynom));
+            //selectIntervalSecFault = new List<double>(selectIntervalSecFault.GetRange(0, numberValuesForPolynom));
+            //List<double> Y = new List<double>(selectIntervalSecFault);
+            //List<List<double>> Z = new List<List<double>>();
+
+            //Z.Add(OnesList(numberValuesForPolynom));
+
+            //for (int i = 1; i <= 15; i++) {
+            //    Z.Add(PowList(selectIntervalRefFault, i));
+            //}
+        }
+
+        private void FindBestPolynom(object sender, DoWorkEventArgs e) {
+            //dataGVbestIntervalsOfFault.ColumnCount = 2;
+            //dataGVbestIntervalsOfFault.Rows.Add(referenceFaultHeader.Item1, secondFaultHeader.Item1);
+
+            //// Run background worker for load best intervals of reference and second fault
+            //workerStep3.ProgressChanged += new ProgressChangedEventHandler(ProgressSelectIntervalChanged);
+            //workerStep3.DoWork += new DoWorkEventHandler(WriteBestIntervalsToDataGridAsync);
+            //workerStep3.WorkerReportsProgress = true;
+            //dataGVbestIntervalsOfFault.Size = new Size(341, 329);
+            //progressBarSelectedInterval.Value = 0;
+            //progressBarSelectedInterval.Visible = true;
+            //workerStep3.RunWorkerAsync();
+        }
+
+        /// <summary>
+        /// Change progress bar value for select interval bar
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ProgressFindBestPolyChanged(object sender, ProgressChangedEventArgs e) {
+            if (e.ProgressPercentage > 100) {
+                progressBestPoly.Value = 100;
+            }
+            else {
+                progressBestPoly.Value = e.ProgressPercentage;
+            }
+        }
+
+        /// <summary>
+        /// Function that returns list of ones
+        /// </summary>
+        /// <param name="n">List size</param>
+        /// <returns>List of ones</returns>
+        private List<double> OnesList(int n) {
+            List<double> ones = new List<double>();
+            for (int i = 0; i < n; i++) {
+                ones.Add(1.0);
+            }
+            return ones;
+        }
+
+        /// <summary>
+        /// Function that pow list of numbers
+        /// </summary>
+        /// <param name="numList">List of numbers</param>
+        /// <param name="m">Pow value</param>
+        /// <returns>Pow list</returns>
+        private List<double> PowList(List<double> numList, int m) {
+            List<double> powList = new List<double>();
+            foreach (double elem in numList) {
+                powList.Add(Math.Pow(elem, m));
+            }
+            return powList;
         }
     }
 }
