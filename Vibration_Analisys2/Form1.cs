@@ -473,10 +473,8 @@ namespace Vibration_Analisys2 {
             selectIntervalRefFault = new List<double>(referenceFault.GetRange(0, secondFault.Count - bestStartIndexSecFault));
             selectIntervalSecFault = new List<double>(secondFault.GetRange(bestStartIndexSecFault, secondFault.Count - bestStartIndexSecFault));
 
-            MessageBox.Show(selectIntervalRefFault.Count.ToString());
-            MessageBox.Show(selectIntervalSecFault.Count.ToString());
-
             WriteBestIntervalsIntoDataGridView();
+            step4.Enabled = true;
         }
 
         /// <summary>

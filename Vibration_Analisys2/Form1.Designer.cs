@@ -65,6 +65,7 @@
             this.errorProvider1 = new System.Windows.Forms.ErrorProvider(this.components);
             this.progressBarSelectedInterval = new System.Windows.Forms.ProgressBar();
             this.dataGVbestIntervalsOfFault = new System.Windows.Forms.DataGridView();
+            this.step4 = new System.Windows.Forms.TabPage();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGV)).BeginInit();
             this.allSteps.SuspendLayout();
@@ -169,6 +170,7 @@
             this.allSteps.Controls.Add(this.step1);
             this.allSteps.Controls.Add(this.step2);
             this.allSteps.Controls.Add(this.step3);
+            this.allSteps.Controls.Add(this.step4);
             this.allSteps.Location = new System.Drawing.Point(12, 27);
             this.allSteps.Name = "allSteps";
             this.allSteps.SelectedIndex = 0;
@@ -518,6 +520,15 @@
             this.dataGVbestIntervalsOfFault.Size = new System.Drawing.Size(341, 353);
             this.dataGVbestIntervalsOfFault.TabIndex = 15;
             // 
+            // step4
+            // 
+            this.step4.Location = new System.Drawing.Point(4, 22);
+            this.step4.Name = "step4";
+            this.step4.Size = new System.Drawing.Size(879, 406);
+            this.step4.TabIndex = 3;
+            this.step4.Text = "Шаг 4";
+            this.step4.UseVisualStyleBackColor = true;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -594,6 +605,7 @@
         private System.Windows.Forms.TextBox bestIndexSecFaultTextBox;
         private System.Windows.Forms.ProgressBar progressBarSelectedInterval;
         private System.Windows.Forms.DataGridView dataGVbestIntervalsOfFault;
+        private System.Windows.Forms.TabPage step4;
     }
 }
 
