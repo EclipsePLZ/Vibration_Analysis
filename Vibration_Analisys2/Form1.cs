@@ -41,15 +41,15 @@ namespace Vibration_Analisys2 {
 
         public MainForm() {
             InitializeComponent();
+
             // Centered Main From on the screen
             this.CenterToScreen();
+
+            // Locks all tabs except the first one
             foreach (TabPage tab in allSteps.TabPages){
                 tab.Enabled = false;
             }
             step1.Enabled = true;
-            //step2.Enabled = false;
-            //step3.Enabled = false;
-            //numberOfStdForMaxLevel.Maximum = decimal.MaxValue;
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace Vibration_Analisys2 {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void openExcelFile_Click(object sender, EventArgs e) {
-            ClearRenameControls();
+            ClearAllTabControls();
 
             // Open xlsx file dialog
             using (OpenFileDialog ofd = new OpenFileDialog()) {
@@ -66,6 +66,8 @@ namespace Vibration_Analisys2 {
                 ofd.Title = "Choose the file";
                 if (ofd.ShowDialog() == DialogResult.OK) {
                     filenameExcel = ofd.FileName;
+
+                    // Run background worker for load data from excel file
                     workerStep1.ProgressChanged += new ProgressChangedEventHandler(ProgressExcelLoadChanged);
                     workerStep1.DoWork += new DoWorkEventHandler(LoadData);
                     workerStep1.WorkerReportsProgress = true;
@@ -76,18 +78,28 @@ namespace Vibration_Analisys2 {
             }
         }
 
-        private void ClearRenameControls() {
+        /// <summary>
+        /// Function for clear controls from all tabs
+        /// </summary>
+        private void ClearAllTabControls() {
             ClearControlsStep1();
             ClearControlsStep2();
             ClearControlsStep3();
         }
 
+        /// <summary>
+        /// Function for clear controls from step1
+        /// </summary>
         private void ClearControlsStep1() {
             dataGV.Rows.Clear();
             dataGV.Refresh();
             referenceFaultBox.Items.Clear();
             secondFaultBox.Items.Clear();
         }
+
+        /// <summary>
+        /// Function for clear controls from step2
+        /// </summary>
         private void ClearControlsStep2() {
             numberOfValuesForNormalWorkLevel.Value = 1;
             numberOfStdForMaxLevel.Value = 1;
@@ -99,6 +111,9 @@ namespace Vibration_Analisys2 {
             dataSignalReliability.Refresh();
         }
 
+        /// <summary>
+        /// Function for clear controls from step3
+        /// </summary>
         private void ClearControlsStep3() {
             numericPieceOfRefFault.Value = 1;
             bestCorrelCoefTextBox.Text = "";
@@ -108,7 +123,7 @@ namespace Vibration_Analisys2 {
         }
 
         /// <summary>
-        /// Load data from excel file to DataGridView
+        /// Function for load data from excel file to DataGridView
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -132,10 +147,13 @@ namespace Vibration_Analisys2 {
                 workerStep1.ReportProgress(progress);
 
                 for (int row = 1; row <= range.Rows.Count; row++) {
+                    // Find progress
                     if (row % step == 0) {
                         progress += oneBarInProgress;
                         workerStep1.ReportProgress(progress);
                     }
+
+                    // Add values from excel sheet to dataGridView
                     List<string> rowValues = new List<string>();
                     for (int col = 1; col <= range.Columns.Count; col++) {
                         rowValues.Add(range.Cells[row, col].Text);
@@ -151,6 +169,8 @@ namespace Vibration_Analisys2 {
                 xlapp.Quit();
                 return;
             }
+
+            // Create a header lists
             List<string> headerList = new List<string>();
             for (int i = 1; i < dataGV.ColumnCount; i++) {
                 headerList.Add(dataGV.Rows[0].Cells[i].Value.ToString());
@@ -215,26 +235,38 @@ namespace Vibration_Analisys2 {
             secondFault.Clear();
 
             try {
+                // Create second and reference fault lists
                 for (int rowNumber = 1; rowNumber < dataGV.Rows.Count; rowNumber++) {
                     referenceFault.Add(Convert.ToDouble(dataGV[referenceFaultHeader.Item2, rowNumber].Value));
                     secondFault.Add(Convert.ToDouble(dataGV[secondFaultHeader.Item2, rowNumber].Value));
                 }
                 step2.Enabled = true;
 
+                // Set maximum values for numeric up down
                 numberOfValuesForNormalWorkLevel.Maximum = secondFault.Count;
                 numberOfStdForMaxLevel.Maximum = decimal.MaxValue;
+
                 allSteps.SelectTab(step2);
-                
             }
             catch (Exception ex) {
                 MessageBox.Show(ex.Message);
             }
         }
 
+        /// <summary>
+        /// Check reference fault box rules
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void referenceFaultBox_SelectedIndexChanged(object sender, EventArgs e) {
             CheckAcceptButtonRule();
         }
 
+        /// <summary>
+        /// Check second fault box rules
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void secondFaultBox_SelectedIndexChanged(object sender, EventArgs e) {
             CheckAcceptButtonRule();
         }
@@ -318,6 +350,7 @@ namespace Vibration_Analisys2 {
             dataSignalReliability.ColumnCount = 2;
             dataSignalReliability.Rows.Add(secondFaultHeader.Item1, "Надежность");
 
+            // Run background worker for load values and reliability of choosen faults into dataGridView
             workerStep2.ProgressChanged += new ProgressChangedEventHandler(ProgressReliabilityChanged);
             workerStep2.DoWork += new DoWorkEventHandler(getReliability);
             workerStep2.WorkerReportsProgress = true;
@@ -351,7 +384,7 @@ namespace Vibration_Analisys2 {
             double prevBiggestSignal = maxNormalVibraitonSignalLevel;
 
             for (int i = 0; i < secondFault.Count; i++) {
-
+                // Find progress
                 if (i % step == 0) {
                     progress += oneBarInProgress;
                     workerStep2.ReportProgress(progress);
@@ -395,7 +428,7 @@ namespace Vibration_Analisys2 {
         }
 
         /// <summary>
-        /// Standard deviation
+        /// Get standard deviation
         /// </summary>
         /// <param name="values">List of values</param>
         /// <returns>Value of standard deviation</returns>
@@ -432,6 +465,9 @@ namespace Vibration_Analisys2 {
 
             selectIntervalSecFault = new List<double>(secondFault.GetRange(bestStartIndexSecFault, numberOfValuesInFault));
 
+            MessageBox.Show(selectIntervalRefFault.Count.ToString());
+            MessageBox.Show(selectIntervalSecFault.Count.ToString());
+
             WriteBestIntervalsIntoDataGridView();
         }
 
@@ -453,6 +489,7 @@ namespace Vibration_Analisys2 {
             dataGVbestIntervalsOfFault.ColumnCount = 2;
             dataGVbestIntervalsOfFault.Rows.Add(referenceFaultHeader.Item1, secondFaultHeader.Item1);
 
+            // Run background worker for load best intervals of reference and second fault
             workerStep3.ProgressChanged += new ProgressChangedEventHandler(ProgressSelectIntervalChanged);
             workerStep3.DoWork += new DoWorkEventHandler(WriteBestIntervalsToDataGridAsync);
             workerStep3.WorkerReportsProgress = true;
@@ -491,6 +528,7 @@ namespace Vibration_Analisys2 {
             workerStep3.ReportProgress(progress);
 
             for (int i = 0; i < selectIntervalRefFault.Count; i++) {
+                // Find progress
                 if (i % step == 0) {
                     progress += oneBarInProgress;
                     workerStep3.ReportProgress(progress);
