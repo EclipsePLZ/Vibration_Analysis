@@ -7,6 +7,7 @@ using System.Windows.Forms;
 
 namespace Vibration_Analisys2 {
     public partial class MainForm : Form {
+        const int MAX_POLYNOM_DEGREE = 15;
 
         /// <summary>
         /// List for reference Fault values
@@ -570,41 +571,58 @@ namespace Vibration_Analisys2 {
             dataGVBestPoly.Rows.Add("Степень полинома", "Коэффициент детерминации", "Уравнение");
 
             // Run background worker for finding polynom coeffs
-            workerStep4.ProgressChanged += ProgressFindBestPolyChanged;
-            workerStep4.DoWork += FindBestPolynom;
+            workerStep4.ProgressChanged += new ProgressChangedEventHandler(ProgressFindBestPolyChanged);
+            workerStep4.DoWork += new DoWorkEventHandler(FindBestPolynom);
             workerStep4.WorkerReportsProgress = true;
             dataGVBestPoly.Size = new Size(553, 405);
             progressBestPoly.Value = 0;
             progressBestPoly.Visible = true;
             workerStep4.RunWorkerAsync();
-            // Доделать 4 шаг
-
-            //int numberValuesForPolynom = (int)numberOfValuesForPolynomes.Value;
-            //int polynomialDegree = 1;
-            //selectIntervalRefFault = new List<double>(selectIntervalRefFault.GetRange(0, numberValuesForPolynom));
-            //selectIntervalSecFault = new List<double>(selectIntervalSecFault.GetRange(0, numberValuesForPolynom));
-            //List<double> Y = new List<double>(selectIntervalSecFault);
-            //List<List<double>> Z = new List<List<double>>();
-
-            //Z.Add(OnesList(numberValuesForPolynom));
-
-            //for (int i = 1; i <= 15; i++) {
-            //    Z.Add(PowList(selectIntervalRefFault, i));
-            //}
         }
 
+        /// <summary>
+        /// Find best polynom in background
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void FindBestPolynom(object sender, DoWorkEventArgs e) {
-            //dataGVbestIntervalsOfFault.ColumnCount = 2;
-            //dataGVbestIntervalsOfFault.Rows.Add(referenceFaultHeader.Item1, secondFaultHeader.Item1);
+            int numberValuesForPolynom = (int)numberOfValuesForPolynomes.Value;
+            int bestPolynomialDegree = 1;
+            double bestDetermCoef = 0;
 
-            //// Run background worker for load best intervals of reference and second fault
-            //workerStep3.ProgressChanged += new ProgressChangedEventHandler(ProgressSelectIntervalChanged);
-            //workerStep3.DoWork += new DoWorkEventHandler(WriteBestIntervalsToDataGridAsync);
-            //workerStep3.WorkerReportsProgress = true;
-            //dataGVbestIntervalsOfFault.Size = new Size(341, 329);
-            //progressBarSelectedInterval.Value = 0;
-            //progressBarSelectedInterval.Visible = true;
-            //workerStep3.RunWorkerAsync();
+            // New selected intervals of faults
+            selectIntervalRefFault = new List<double>(selectIntervalRefFault.GetRange(0, numberValuesForPolynom));
+            selectIntervalSecFault = new List<double>(selectIntervalSecFault.GetRange(0, numberValuesForPolynom));
+
+            List<double> Y = new List<double>(selectIntervalSecFault);
+            List<List<double>> Z = new List<List<double>>();
+
+            Z.Add(OnesList(numberValuesForPolynom));
+
+            // Find one bar value in progress bar
+            int progress = 0;
+            int step = MAX_POLYNOM_DEGREE / 100;
+            int oneBarInProgress = 1;
+            if (MAX_POLYNOM_DEGREE < 100) {
+                step = 1;
+                oneBarInProgress = (100 / MAX_POLYNOM_DEGREE) + 1;
+            }
+            workerStep4.ReportProgress(progress);
+
+            for (int i = 1; i <= MAX_POLYNOM_DEGREE; i++) {
+                // Find progress
+                if (i % step == 0) {
+                    progress += oneBarInProgress;
+                    workerStep4.ReportProgress(progress);
+                }
+
+                Z.Add(PowList(selectIntervalRefFault, i));
+            }
+
+            progressBestPoly.Invoke(new Action<bool>((b) => progressBestPoly.Visible = b), false);
+            dataGVBestPoly.Invoke(new Action<Size>((size) => dataGVBestPoly.Size = size), new Size(553, 436));
+
+            workerStep4.DoWork -= new DoWorkEventHandler(FindBestPolynom);
         }
 
         /// <summary>

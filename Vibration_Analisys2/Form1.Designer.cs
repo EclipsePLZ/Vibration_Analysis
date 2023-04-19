@@ -663,7 +663,7 @@
             this.dataGVBestPoly.Name = "dataGVBestPoly";
             this.dataGVBestPoly.ReadOnly = true;
             this.dataGVBestPoly.RowHeadersWidth = 51;
-            this.dataGVBestPoly.Size = new System.Drawing.Size(553, 405);
+            this.dataGVBestPoly.Size = new System.Drawing.Size(553, 436);
             this.dataGVBestPoly.TabIndex = 17;
             // 
             // MainForm
