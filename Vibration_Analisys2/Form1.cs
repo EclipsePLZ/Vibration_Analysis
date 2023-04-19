@@ -7,8 +7,6 @@ using System.Windows.Forms;
 
 namespace Vibration_Analisys2 {
     public partial class MainForm : Form {
-        const int MAX_POLYNOM_DEGREE = 15;
-
         /// <summary>
         /// List for reference Fault values
         /// </summary>
@@ -126,6 +124,7 @@ namespace Vibration_Analisys2 {
         private void ClearControlsStep4() {
             numberOfValuesInSelectedInterval.Text = "";
             numberOfValuesForPolynomes.Value = 1;
+            maxPolynomDegree.Value = 1;
             dataGVBestPoly.Rows.Clear();
             dataGVBestPoly.Refresh();
         }
@@ -482,6 +481,8 @@ namespace Vibration_Analisys2 {
 
             numberOfValuesInSelectedInterval.Text = selectIntervalSecFault.Count.ToString();
             numberOfValuesForPolynomes.Maximum = selectIntervalSecFault.Count;
+            maxPolynomDegree.Maximum = Decimal.MaxValue;
+            maxPolynomDegree.Value = 15;
         }
 
         /// <summary>
@@ -587,6 +588,7 @@ namespace Vibration_Analisys2 {
         /// <param name="e"></param>
         private void FindBestPolynom(object sender, DoWorkEventArgs e) {
             int numberValuesForPolynom = (int)numberOfValuesForPolynomes.Value;
+            int maxDegree = (int)maxPolynomDegree.Value;
             int bestPolynomialDegree = 1;
             double bestDetermCoef = 0;
 
@@ -596,20 +598,21 @@ namespace Vibration_Analisys2 {
 
             List<double> Y = new List<double>(selectIntervalSecFault);
             List<List<double>> Z = new List<List<double>>();
+            List<List<double>> coeffVectors = new List<List<double>>();
 
             Z.Add(OnesList(numberValuesForPolynom));
 
             // Find one bar value in progress bar
             int progress = 0;
-            int step = MAX_POLYNOM_DEGREE / 100;
+            int step = maxDegree / 100;
             int oneBarInProgress = 1;
-            if (MAX_POLYNOM_DEGREE < 100) {
+            if (maxDegree < 100) {
                 step = 1;
-                oneBarInProgress = (100 / MAX_POLYNOM_DEGREE) + 1;
+                oneBarInProgress = (100 / maxDegree) + 1;
             }
             workerStep4.ReportProgress(progress);
 
-            for (int i = 1; i <= MAX_POLYNOM_DEGREE; i++) {
+            for (int i = 1; i <= maxDegree; i++) {
                 // Find progress
                 if (i % step == 0) {
                     progress += oneBarInProgress;
@@ -617,6 +620,15 @@ namespace Vibration_Analisys2 {
                 }
 
                 Z.Add(PowList(selectIntervalRefFault, i));
+                List<double> coeffVector = FindVectorOfCoeffs(Z, Y);
+                // Проверка коэффициента детерминации (скорректированного)
+                double determCoeff = GetDetermCoeff(Z, coeffVector, Y);
+
+                coeffVectors.Add(coeffVector);
+
+                string newEquation = GetEquation(coeffVector);
+
+                dataGVBestPoly.Invoke(new Action<(int, double, string)>((data) => WriteRowOfPolynom(data)), (i, determCoeff, newEquation));
             }
 
             progressBestPoly.Invoke(new Action<bool>((b) => progressBestPoly.Visible = b), false);
@@ -664,6 +676,91 @@ namespace Vibration_Analisys2 {
                 powList.Add(Math.Pow(elem, m));
             }
             return powList;
+        }
+
+        private List<double> FindVectorOfCoeffs(List<List<double>> Z, List<double> Y) {
+            List<double> coeffs = new List<double>();
+            List<List<double>> transposeZ = Transpose(Z);
+
+
+            return coeffs;
+        }
+
+        /// <summary>
+        /// Transpose matrix
+        /// </summary>
+        /// <param name="matrix">Input matrix</param>
+        /// <returns>Transposed matrix</returns>
+        private List<List<double>> Transpose (List<List<double>> matrix) {
+            List<List<double>> transposeMatrix = new List<List<double>>();
+
+            return transposeMatrix;
+        }
+
+        /// <summary>
+        /// Get Adjusted coefficient of determination
+        /// </summary>
+        /// <param name="Z">Z-values</param>
+        /// <param name="coeffs">Vector of coefficients</param>
+        /// <param name="Y">Vector of real Y-values</param>
+        /// <returns>Adjusted coefficient of determination</returns>
+        private double GetDetermCoeff(List<List<double>> Z, List<double> coeffs, List<double> Y) {
+            int n = Y.Count;
+            int k = Z.Count - 1;
+            double rss = 0.0;
+            double tss = 0.0;
+            double meanY = Y.Average();
+            List<double> predictedY = GetPredicted(Z, coeffs);
+
+            for (int i = 0; i < Y.Count; i++) {
+                rss += Math.Pow((Y[i] - predictedY[i]), 2);
+                tss += Math.Pow((Y[i] - meanY), 2);
+            }
+
+            return 1 - ((rss / Convert.ToDouble(n - k)) / (tss / Convert.ToDouble(n - 1)));
+        }
+
+        /// <summary>
+        /// Get vector of predicted values
+        /// </summary>
+        /// <param name="Z">Z values</param>
+        /// <param name="coeffs">Сoefficients</param>
+        /// <returns>Vector of predicted values</returns>
+        private List<double> GetPredicted(List<List<double>> Z, List<double> coeffs) {
+            List<double> predicted = new List<double>();
+
+            for (int i = 0; i < Z[0].Count; i++) {
+                double nextY = 0;
+                for (int j = 0; j < coeffs.Count; j++) {
+                    nextY += coeffs[j] * Z[j][i];
+                }
+                predicted.Add(nextY);
+            }
+
+            return predicted;
+        }
+
+        /// <summary>
+        /// Get equation of polynom
+        /// </summary>
+        /// <param name="coeffs"></param>
+        /// <returns>Equation in string</returns>
+        private string GetEquation(List<double> coeffs) {
+            string equation = "Y = " + coeffs[0];
+
+            for (int i = 1; i < coeffs.Count; i++) {
+                equation += " + " + coeffs[i].ToString() + "X" + i.ToString();
+            }
+
+            return equation;
+        }
+
+        /// <summary>
+        /// Write row to data that contains polynoms
+        /// </summary>
+        /// <param name="row">Row values</param>
+        private void WriteRowOfPolynom((int, double, string) row) {
+            dataGVBestPoly.Rows.Add(row.Item1, row.Item2, row.Item3);
         }
     }
 }
