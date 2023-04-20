@@ -124,7 +124,7 @@ namespace Vibration_Analisys2 {
         private void ClearControlsStep4() {
             numberOfValuesInSelectedInterval.Text = "";
             numberOfValuesForPolynomes.Value = 1;
-            maxPolynomDegree.Value = 1;
+            maxPolynomDegree.Value = 15;
             dataGVBestPoly.Rows.Clear();
             dataGVBestPoly.Refresh();
         }
@@ -730,6 +730,11 @@ namespace Vibration_Analisys2 {
             return resultMatrix;
         }
 
+        /// <summary>
+        /// Inverse matrix
+        /// </summary>
+        /// <param name="matrix">Matrix</param>
+        /// <returns>Inversed matrix</returns>
         private List<List<double>> InverseMatrix(List<List<double>> matrix) {
             List<List<double>> additionalMatrix = new List<List<double>>(matrix);
 
@@ -757,17 +762,17 @@ namespace Vibration_Analisys2 {
                     additionalMatrix[col][row] = additionalMatrix[col][row] / diagElem;
                 }
 
-                // Substracting permit row from under rows
-                for (int rowSub = row + 1; rowSub < numCols; rowSub++) {
-                    double underDiagElem = additionalMatrix[row][rowSub];
+                // Substracting permit row from other rows
+                for (int rowSub = 0; rowSub < numCols; rowSub++) {
+                    if (rowSub != row) {
+                        double otherDiagElem = additionalMatrix[row][rowSub];
 
-                    for (int colSub = row; colSub < numCols * 2; colSub++) {
-
+                        for (int colSub = row; colSub < numCols * 2; colSub++) {
+                            additionalMatrix[colSub][rowSub] -= additionalMatrix[colSub][row] * otherDiagElem;
+                        }
                     }
                 }
-
             }
-
             return additionalMatrix.GetRange(numCols, numCols);
         }
 
