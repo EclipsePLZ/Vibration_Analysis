@@ -678,6 +678,7 @@ namespace Vibration_Analisys2 {
             return powList;
         }
 
+
         private List<double> FindVectorOfCoeffs(List<List<double>> Z, List<double> Y) {
             List<double> coeffs = new List<double>();
             List<List<double>> transposeZ = Transpose(Z);
@@ -694,7 +695,80 @@ namespace Vibration_Analisys2 {
         private List<List<double>> Transpose (List<List<double>> matrix) {
             List<List<double>> transposeMatrix = new List<List<double>>();
 
+            for (int i = 0; i < matrix[0].Count; i++) {
+                List<double> nextRow = new List<double>();
+                for (int j = 0; j < matrix.Count; j++) {
+                    nextRow.Add(matrix[j][i]);
+                }
+                transposeMatrix.Add(nextRow);
+            }
+
             return transposeMatrix;
+        }
+
+        /// <summary>
+        /// Get matrix that represent mult of two matrices
+        /// </summary>
+        /// <param name="matrixA">First matrix</param>
+        /// <param name="matrixB">Second matrix</param>
+        /// <returns>Result mult two matrices</returns>
+        private List<List<double>> MultTwoMatrix(List<List<double>> matrixA, List<List<double>> matrixB) {
+            List<List<double>> resultMatrix = new List<List<double>>();
+
+            for (int colB = 0; colB < matrixB.Count; colB++) {
+                List<double> nextCol = new List<double>();
+                for (int rowA = 0; rowA < matrixA[0].Count; rowA++) {
+                    double nextElem = 0;
+                    for (int colA = 0; colA < matrixA.Count; colA++) {
+                        nextElem += matrixA[colA][rowA] * matrixB[colB][colA];
+                    }
+                    nextCol.Add(nextElem);
+                }
+                resultMatrix.Add(nextCol);
+            }
+
+            return resultMatrix;
+        }
+
+        private List<List<double>> InverseMatrix(List<List<double>> matrix) {
+            List<List<double>> additionalMatrix = new List<List<double>>(matrix);
+
+            int numCols = additionalMatrix.Count;
+
+            // Add ones matrix to input matrix
+            for (int i = 0; i < numCols; i++) {
+                List<double> nextCol = new List<double>();
+                for (int j = 0; j < numCols; j++) {
+                    if (i == j) {
+                        nextCol.Add(1.0);
+                        continue;
+                    }
+                    nextCol.Add(0.0);
+                }
+                additionalMatrix.Add(nextCol);
+            }
+
+            // Gauss-Jordan Algorithm
+            for (int row = 0; row < numCols; row++) {
+                double diagElem = additionalMatrix[row][row];
+
+                // Divide row elements by diagElem
+                for (int col = row; col < numCols * 2; col++) {
+                    additionalMatrix[col][row] = additionalMatrix[col][row] / diagElem;
+                }
+
+                // Substracting permit row from under rows
+                for (int rowSub = row + 1; rowSub < numCols; rowSub++) {
+                    double underDiagElem = additionalMatrix[row][rowSub];
+
+                    for (int colSub = row; colSub < numCols * 2; colSub++) {
+
+                    }
+                }
+
+            }
+
+            return additionalMatrix.GetRange(numCols, numCols);
         }
 
         /// <summary>
