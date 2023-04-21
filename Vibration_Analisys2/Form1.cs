@@ -50,6 +50,8 @@ namespace Vibration_Analisys2 {
                 tab.Enabled = false;
             }
             step1.Enabled = true;
+
+            maxPolynomDegree.Maximum = Decimal.MaxValue;
         }
 
         /// <summary>
@@ -127,6 +129,8 @@ namespace Vibration_Analisys2 {
             maxPolynomDegree.Value = 15;
             dataGVBestPoly.Rows.Clear();
             dataGVBestPoly.Refresh();
+            bestPolyDegreeValue.Text = "";
+            bestDetermCoeffValue.Text = "";
         }
 
         /// <summary>
@@ -165,6 +169,11 @@ namespace Vibration_Analisys2 {
                     for (int col = 1; col <= range.Columns.Count; col++) {
                         rowValues.Add(range.Cells[row, col].Text);
                     }
+
+                    if (row == 1) {
+                        dataGV.Invoke(new Action<List<string>>((s) => ExcelDataSetHeaders(s)), rowValues);
+                        continue;
+                    }
                     dataGV.Invoke(new Action<List<string>>((s) => AddRowFunc(s)), rowValues);
                 }
                 workbook.Close();
@@ -191,6 +200,14 @@ namespace Vibration_Analisys2 {
 
             dataGV.Invoke(new Action<Size>((size) => dataGV.Size = size), new Size(682, 395));
             workerStep1.DoWork -= new DoWorkEventHandler(LoadData);
+        }
+
+        /// <summary>
+        /// Set headers for main excel dataGV
+        /// </summary>
+        /// <param name="headers">List of headers</param>
+        private void ExcelDataSetHeaders(List<string> headers) {
+            SetDataGVColumnHeaders(headers, dataGV);
         }
 
         /// <summary>
@@ -356,7 +373,7 @@ namespace Vibration_Analisys2 {
         /// </summary>
         private void getReliabilityForSecondSignal() {
             dataSignalReliability.ColumnCount = 2;
-            dataSignalReliability.Rows.Add(secondFaultHeader.Item1, "Надежность");
+            SetDataGVColumnHeaders(new List<string>() { secondFaultHeader.Item1, "Надежность" }, dataSignalReliability);
 
             // Run background worker for load values and reliability of choosen faults into dataGridView
             workerStep2.ProgressChanged += new ProgressChangedEventHandler(ProgressReliabilityChanged);
@@ -471,7 +488,7 @@ namespace Vibration_Analisys2 {
             application.Quit();
 
             bestCorrelCoefTextBox.Text = bestCorrCoef.ToString();
-            bestIndexSecFaultTextBox.Text = bestStartIndexSecFault.ToString();
+            bestIndexSecFaultTextBox.Text = (bestStartIndexSecFault + 1).ToString();
 
             selectIntervalRefFault = new List<double>(referenceFault.GetRange(0, secondFault.Count - bestStartIndexSecFault));
             selectIntervalSecFault = new List<double>(secondFault.GetRange(bestStartIndexSecFault, secondFault.Count - bestStartIndexSecFault));
@@ -481,8 +498,9 @@ namespace Vibration_Analisys2 {
 
             numberOfValuesInSelectedInterval.Text = selectIntervalSecFault.Count.ToString();
             numberOfValuesForPolynomes.Maximum = selectIntervalSecFault.Count;
-            maxPolynomDegree.Maximum = Decimal.MaxValue;
             maxPolynomDegree.Value = 15;
+
+            numberOfValuesForPolynomes.Value = selectIntervalSecFault.Count;
         }
 
         /// <summary>
@@ -501,7 +519,7 @@ namespace Vibration_Analisys2 {
         /// </summary>
         private void WriteBestIntervalsIntoDataGridView() {
             dataGVbestIntervalsOfFault.ColumnCount = 2;
-            dataGVbestIntervalsOfFault.Rows.Add(referenceFaultHeader.Item1, secondFaultHeader.Item1);
+            SetDataGVColumnHeaders(new List<string>() { referenceFaultHeader.Item1, secondFaultHeader.Item1 }, dataGVbestIntervalsOfFault);
 
             // Run background worker for load best intervals of reference and second fault
             workerStep3.ProgressChanged += new ProgressChangedEventHandler(ProgressSelectIntervalChanged);
@@ -569,7 +587,14 @@ namespace Vibration_Analisys2 {
 
         private void FindPolynomButton_Click(object sender, EventArgs e) {
             dataGVBestPoly.ColumnCount = 3;
-            dataGVBestPoly.Rows.Add("Степень полинома", "Коэффициент детерминации", "Уравнение");
+
+            SetDataGVColumnHeaders(new List<string>() { "Степень полинома", "Коэффициент детерминации", "Уравнение" }, dataGVBestPoly);
+            
+            dataGVBestPoly.Columns[1].SortMode = DataGridViewColumnSortMode.Automatic;
+
+            for (int i = 0; i < dataGVBestPoly.Columns.Count; i++) {
+                dataGVBestPoly.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            }
 
             // Run background worker for finding polynom coeffs
             workerStep4.ProgressChanged += new ProgressChangedEventHandler(ProgressFindBestPolyChanged);
@@ -620,9 +645,17 @@ namespace Vibration_Analisys2 {
                 }
 
                 Z.Add(PowList(selectIntervalRefFault, i));
+
+                // Find vector of coefficients
                 List<double> coeffVector = FindVectorOfCoeffs(Z, Y);
-                // Проверка коэффициента детерминации (скорректированного)
+
+                // Adjusted coefficient of determination
                 double determCoeff = GetDetermCoeff(Z, coeffVector, Y);
+
+                if (determCoeff > bestDetermCoef) {
+                    bestDetermCoef = determCoeff;
+                    bestPolynomialDegree = i;
+                }
 
                 coeffVectors.Add(coeffVector);
 
@@ -631,8 +664,12 @@ namespace Vibration_Analisys2 {
                 dataGVBestPoly.Invoke(new Action<(int, double, string)>((data) => WriteRowOfPolynom(data)), (i, determCoeff, newEquation));
             }
 
+            bestPolyDegreeValue.Invoke(new Action<string>((s) => bestPolyDegreeValue.Text = s), bestPolynomialDegree.ToString());
+            bestDetermCoeffValue.Invoke(new Action<string>((s) => bestDetermCoeffValue.Text = s), bestDetermCoef.ToString());
+            bestEquation.Invoke(new Action<string>((s) => bestEquation.Text = s), dataGVBestPoly[2, bestPolynomialDegree + 1].Value);
+
             progressBestPoly.Invoke(new Action<bool>((b) => progressBestPoly.Visible = b), false);
-            dataGVBestPoly.Invoke(new Action<Size>((size) => dataGVBestPoly.Size = size), new Size(553, 436));
+            dataGVBestPoly.Invoke(new Action<Size>((size) => dataGVBestPoly.Size = size), new Size(415, 354));
 
             workerStep4.DoWork -= new DoWorkEventHandler(FindBestPolynom);
         }
@@ -678,13 +715,16 @@ namespace Vibration_Analisys2 {
             return powList;
         }
 
-
+        /// <summary>
+        /// Find vector of coefficients
+        /// </summary>
+        /// <param name="Z">Z values</param>
+        /// <param name="Y">Vector of real Y-values</param>
+        /// <returns>Vector of equation coefficients</returns>
         private List<double> FindVectorOfCoeffs(List<List<double>> Z, List<double> Y) {
-            List<double> coeffs = new List<double>();
             List<List<double>> transposeZ = Transpose(Z);
 
-
-            return coeffs;
+            return MultMatrixVector(MultTwoMatrix(InverseMatrix(MultTwoMatrix(transposeZ, Z)), transposeZ), Y);
         }
 
         /// <summary>
@@ -777,6 +817,25 @@ namespace Vibration_Analisys2 {
         }
 
         /// <summary>
+        /// Get vector that represent mult matrix by vector
+        /// </summary>
+        /// <param name="matrix">Matrix</param>
+        /// <param name="vector">Vector</param>
+        /// <returns>Result mult matrix by vector</returns>
+        private List<double> MultMatrixVector(List<List<double>> matrix, List<double> vector) {
+            List<double> resultVector = new List<double>();
+
+            for (int row = 0; row < matrix[0].Count; row++) {
+                double nextElem = 0;
+                for (int col = 0; col < matrix.Count; col++) {
+                    nextElem += matrix[col][row] * vector[col];
+                }
+                resultVector.Add(nextElem);
+            }
+            return resultVector;
+        }
+
+        /// <summary>
         /// Get Adjusted coefficient of determination
         /// </summary>
         /// <param name="Z">Z-values</param>
@@ -808,10 +867,10 @@ namespace Vibration_Analisys2 {
         private List<double> GetPredicted(List<List<double>> Z, List<double> coeffs) {
             List<double> predicted = new List<double>();
 
-            for (int i = 0; i < Z[0].Count; i++) {
+            for (int rows = 0; rows < Z[0].Count; rows++) {
                 double nextY = 0;
-                for (int j = 0; j < coeffs.Count; j++) {
-                    nextY += coeffs[j] * Z[j][i];
+                for (int cols = 0; cols < coeffs.Count; cols++) {
+                    nextY += coeffs[cols] * Z[cols][rows];
                 }
                 predicted.Add(nextY);
             }
@@ -828,7 +887,11 @@ namespace Vibration_Analisys2 {
             string equation = "Y = " + coeffs[0];
 
             for (int i = 1; i < coeffs.Count; i++) {
-                equation += " + " + coeffs[i].ToString() + "X" + i.ToString();
+                if (coeffs[i] < 0) {
+                    equation += " - " + Math.Abs(Math.Round(coeffs[i], 4)).ToString() + "*X" + i.ToString();
+                    continue;
+                }
+                equation += " + " + Math.Round(coeffs[i], 4).ToString() + "*X" + i.ToString();
             }
 
             return equation;
@@ -840,6 +903,12 @@ namespace Vibration_Analisys2 {
         /// <param name="row">Row values</param>
         private void WriteRowOfPolynom((int, double, string) row) {
             dataGVBestPoly.Rows.Add(row.Item1, row.Item2, row.Item3);
+        }
+
+        private void SetDataGVColumnHeaders(List<string> headers, DataGridView dataGV) {
+            for (int i = 0; i < dataGV.Columns.Count; i++) {
+                dataGV.Columns[i].HeaderText = headers[i];
+            }
         }
     }
 }

@@ -75,6 +75,12 @@
             this.label12 = new System.Windows.Forms.Label();
             this.numberOfValuesInSelectedInterval = new System.Windows.Forms.TextBox();
             this.errorProvider1 = new System.Windows.Forms.ErrorProvider(this.components);
+            this.label15 = new System.Windows.Forms.Label();
+            this.bestPolyDegreeValue = new System.Windows.Forms.TextBox();
+            this.label16 = new System.Windows.Forms.Label();
+            this.bestDetermCoeffValue = new System.Windows.Forms.TextBox();
+            this.label17 = new System.Windows.Forms.Label();
+            this.bestEquation = new System.Windows.Forms.TextBox();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGV)).BeginInit();
             this.allSteps.SuspendLayout();
@@ -117,7 +123,7 @@
             // openExcelFile
             // 
             this.openExcelFile.Name = "openExcelFile";
-            this.openExcelFile.Size = new System.Drawing.Size(121, 22);
+            this.openExcelFile.Size = new System.Drawing.Size(180, 22);
             this.openExcelFile.Text = "Открыть";
             this.openExcelFile.Click += new System.EventHandler(this.openExcelFile_Click);
             // 
@@ -533,6 +539,12 @@
             // 
             // step4
             // 
+            this.step4.Controls.Add(this.label17);
+            this.step4.Controls.Add(this.bestEquation);
+            this.step4.Controls.Add(this.label16);
+            this.step4.Controls.Add(this.bestDetermCoeffValue);
+            this.step4.Controls.Add(this.label15);
+            this.step4.Controls.Add(this.bestPolyDegreeValue);
             this.step4.Controls.Add(this.maxPolynomDegree);
             this.step4.Controls.Add(this.label14);
             this.step4.Controls.Add(this.progressBestPoly);
@@ -551,7 +563,7 @@
             // 
             // maxPolynomDegree
             // 
-            this.maxPolynomDegree.Location = new System.Drawing.Point(206, 169);
+            this.maxPolynomDegree.Location = new System.Drawing.Point(206, 134);
             this.maxPolynomDegree.Maximum = new decimal(new int[] {
             1,
             0,
@@ -575,7 +587,7 @@
             // label14
             // 
             this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(52, 162);
+            this.label14.Location = new System.Drawing.Point(52, 127);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(104, 26);
             this.label14.TabIndex = 19;
@@ -596,14 +608,14 @@
             this.dataGVBestPoly.Location = new System.Drawing.Point(436, 24);
             this.dataGVBestPoly.Name = "dataGVBestPoly";
             this.dataGVBestPoly.ReadOnly = true;
-            this.dataGVBestPoly.RowHeadersWidth = 51;
+            this.dataGVBestPoly.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
             this.dataGVBestPoly.Size = new System.Drawing.Size(415, 354);
             this.dataGVBestPoly.TabIndex = 17;
             // 
             // FindPolynomButton
             // 
             this.FindPolynomButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.FindPolynomButton.Location = new System.Drawing.Point(95, 271);
+            this.FindPolynomButton.Location = new System.Drawing.Point(95, 319);
             this.FindPolynomButton.Name = "FindPolynomButton";
             this.FindPolynomButton.Size = new System.Drawing.Size(154, 59);
             this.FindPolynomButton.TabIndex = 14;
@@ -613,7 +625,7 @@
             // 
             // numberOfValuesForPolynomes
             // 
-            this.numberOfValuesForPolynomes.Location = new System.Drawing.Point(206, 110);
+            this.numberOfValuesForPolynomes.Location = new System.Drawing.Point(206, 92);
             this.numberOfValuesForPolynomes.Maximum = new decimal(new int[] {
             1,
             0,
@@ -637,7 +649,7 @@
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(52, 103);
+            this.label13.Location = new System.Drawing.Point(52, 85);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(149, 26);
             this.label13.TabIndex = 12;
@@ -646,7 +658,7 @@
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(52, 45);
+            this.label12.Location = new System.Drawing.Point(52, 24);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(125, 26);
             this.label12.TabIndex = 11;
@@ -654,7 +666,7 @@
             // 
             // numberOfValuesInSelectedInterval
             // 
-            this.numberOfValuesInSelectedInterval.Location = new System.Drawing.Point(206, 50);
+            this.numberOfValuesInSelectedInterval.Location = new System.Drawing.Point(206, 29);
             this.numberOfValuesInSelectedInterval.Name = "numberOfValuesInSelectedInterval";
             this.numberOfValuesInSelectedInterval.ReadOnly = true;
             this.numberOfValuesInSelectedInterval.Size = new System.Drawing.Size(100, 20);
@@ -663,6 +675,57 @@
             // errorProvider1
             // 
             this.errorProvider1.ContainerControl = this;
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(52, 193);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(163, 13);
+            this.label15.TabIndex = 22;
+            this.label15.Text = "Наилучшая степень полинома:";
+            // 
+            // bestPolyDegreeValue
+            // 
+            this.bestPolyDegreeValue.Location = new System.Drawing.Point(226, 190);
+            this.bestPolyDegreeValue.Name = "bestPolyDegreeValue";
+            this.bestPolyDegreeValue.ReadOnly = true;
+            this.bestPolyDegreeValue.Size = new System.Drawing.Size(100, 20);
+            this.bestPolyDegreeValue.TabIndex = 21;
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(52, 222);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(173, 26);
+            this.label16.TabIndex = 24;
+            this.label16.Text = "Лучшее значение коэффициента\r\nдетерминации:";
+            // 
+            // bestDetermCoeffValue
+            // 
+            this.bestDetermCoeffValue.Location = new System.Drawing.Point(226, 228);
+            this.bestDetermCoeffValue.Name = "bestDetermCoeffValue";
+            this.bestDetermCoeffValue.ReadOnly = true;
+            this.bestDetermCoeffValue.Size = new System.Drawing.Size(100, 20);
+            this.bestDetermCoeffValue.TabIndex = 23;
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(52, 266);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(104, 13);
+            this.label17.TabIndex = 26;
+            this.label17.Text = "Лучшее уравнение:";
+            // 
+            // bestEquation
+            // 
+            this.bestEquation.Location = new System.Drawing.Point(51, 282);
+            this.bestEquation.Name = "bestEquation";
+            this.bestEquation.ReadOnly = true;
+            this.bestEquation.Size = new System.Drawing.Size(275, 20);
+            this.bestEquation.TabIndex = 25;
             // 
             // MainForm
             // 
@@ -755,6 +818,12 @@
         private System.Windows.Forms.DataGridView dataGVBestPoly;
         private System.Windows.Forms.NumericUpDown maxPolynomDegree;
         private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.TextBox bestDetermCoeffValue;
+        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.TextBox bestPolyDegreeValue;
+        private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.TextBox bestEquation;
     }
 }
 
