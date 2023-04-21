@@ -7,6 +7,9 @@ using System.Windows.Forms;
 
 namespace Vibration_Analisys2 {
     public partial class MainForm : Form {
+        // Excel connector
+        Microsoft.Office.Interop.Excel.Application xlapp = new Microsoft.Office.Interop.Excel.Application();
+
         /// <summary>
         /// List for reference Fault values
         /// </summary>
@@ -139,7 +142,6 @@ namespace Vibration_Analisys2 {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void LoadData(object sender, DoWorkEventArgs e) {
-            Microsoft.Office.Interop.Excel.Application xlapp = new Microsoft.Office.Interop.Excel.Application();
             Microsoft.Office.Interop.Excel.Workbook workbook = xlapp.Workbooks.Open(filenameExcel);
             Microsoft.Office.Interop.Excel.Worksheet sheet;
             Microsoft.Office.Interop.Excel.Range range;
@@ -176,12 +178,11 @@ namespace Vibration_Analisys2 {
                     }
                     dataGV.Invoke(new Action<List<string>>((s) => AddRowFunc(s)), rowValues);
                 }
-                workbook.Close();
-                xlapp.Quit();
+                workbook.Close(true);
             }
             catch (Exception ex) {
                 MessageBox.Show(ex.Message);
-                workbook.Close();
+                workbook.Close(0);
                 xlapp.Quit();
                 return;
             }
@@ -189,7 +190,7 @@ namespace Vibration_Analisys2 {
             // Create a header lists
             List<string> headerList = new List<string>();
             for (int i = 1; i < dataGV.ColumnCount; i++) {
-                headerList.Add(dataGV.Rows[0].Cells[i].Value.ToString());
+                headerList.Add(dataGV.Columns[i].HeaderText);
             }
             referenceFaultBox.Invoke(new Action<List<string>>((s) => AddHeadersInReferenceFaultBox(s)), headerList);
             secondFaultBox.Invoke(new Action<List<string>>((s) => AddHeadersInSecondFaultBox(s)), headerList);
@@ -207,7 +208,7 @@ namespace Vibration_Analisys2 {
         /// </summary>
         /// <param name="headers">List of headers</param>
         private void ExcelDataSetHeaders(List<string> headers) {
-            SetDataGVColumnHeaders(headers, dataGV);
+            SetDataGVColumnHeaders(headers, dataGV, false);
         }
 
         /// <summary>
@@ -373,7 +374,7 @@ namespace Vibration_Analisys2 {
         /// </summary>
         private void getReliabilityForSecondSignal() {
             dataSignalReliability.ColumnCount = 2;
-            SetDataGVColumnHeaders(new List<string>() { secondFaultHeader.Item1, "Надежность" }, dataSignalReliability);
+            SetDataGVColumnHeaders(new List<string>() { secondFaultHeader.Item1, "Надежность" }, dataSignalReliability, false);
 
             // Run background worker for load values and reliability of choosen faults into dataGridView
             workerStep2.ProgressChanged += new ProgressChangedEventHandler(ProgressReliabilityChanged);
@@ -476,16 +477,13 @@ namespace Vibration_Analisys2 {
             double bestCorrCoef = 0;
             int bestStartIndexSecFault = 0;
 
-            var application = new Microsoft.Office.Interop.Excel.Application();
-
             for (int i = 0; i < (secondFault.Count - numberOfValuesInFault); i++) {
-                double corrCoef = CorrelCoef(selectIntervalRefFault, secondFault.GetRange(i, numberOfValuesInFault), application);
+                double corrCoef = CorrelCoef(selectIntervalRefFault, secondFault.GetRange(i, numberOfValuesInFault));
                 if (Math.Abs(corrCoef) > Math.Abs(bestCorrCoef)) {
                     bestCorrCoef = corrCoef;
                     bestStartIndexSecFault = i;
                 }
             }
-            application.Quit();
 
             bestCorrelCoefTextBox.Text = bestCorrCoef.ToString();
             bestIndexSecFaultTextBox.Text = (bestStartIndexSecFault + 1).ToString();
@@ -510,8 +508,8 @@ namespace Vibration_Analisys2 {
         /// <param name="list2">Second list of values</param>
         /// <param name="app">Excel application</param>
         /// <returns>Value of Correlation coefficient</returns>
-        private double CorrelCoef(IEnumerable<double> list1, IEnumerable<double> list2, Microsoft.Office.Interop.Excel.Application app) {
-            return app.WorksheetFunction.Correl(list1.ToArray(), list2.ToArray());
+        private double CorrelCoef(IEnumerable<double> list1, IEnumerable<double> list2) {
+            return xlapp.WorksheetFunction.Correl(list1.ToArray(), list2.ToArray());
         }
 
         /// <summary>
@@ -519,7 +517,7 @@ namespace Vibration_Analisys2 {
         /// </summary>
         private void WriteBestIntervalsIntoDataGridView() {
             dataGVbestIntervalsOfFault.ColumnCount = 2;
-            SetDataGVColumnHeaders(new List<string>() { referenceFaultHeader.Item1, secondFaultHeader.Item1 }, dataGVbestIntervalsOfFault);
+            SetDataGVColumnHeaders(new List<string>() { referenceFaultHeader.Item1, secondFaultHeader.Item1 }, dataGVbestIntervalsOfFault, false);
 
             // Run background worker for load best intervals of reference and second fault
             workerStep3.ProgressChanged += new ProgressChangedEventHandler(ProgressSelectIntervalChanged);
@@ -575,6 +573,7 @@ namespace Vibration_Analisys2 {
             dataGVbestIntervalsOfFault.Invoke(new Action<Size>((size) => dataGVbestIntervalsOfFault.Size = size), new Size(341, 353));
 
             workerStep3.DoWork -= new DoWorkEventHandler(WriteBestIntervalsToDataGridAsync);
+            workerStep3.Dispose();
         }
 
         /// <summary>
@@ -585,16 +584,17 @@ namespace Vibration_Analisys2 {
             dataGVbestIntervalsOfFault.Rows.Add(values.Item1, values.Item2);
         }
 
+        /// <summary>
+        /// Find best polynom
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void FindPolynomButton_Click(object sender, EventArgs e) {
             dataGVBestPoly.ColumnCount = 3;
 
-            SetDataGVColumnHeaders(new List<string>() { "Степень полинома", "Коэффициент детерминации", "Уравнение" }, dataGVBestPoly);
+            SetDataGVColumnHeaders(new List<string>() { "Степень полинома", "Коэффициент детерминации", "Уравнение" }, dataGVBestPoly, true);
             
             dataGVBestPoly.Columns[1].SortMode = DataGridViewColumnSortMode.Automatic;
-
-            for (int i = 0; i < dataGVBestPoly.Columns.Count; i++) {
-                dataGVBestPoly.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
-            }
 
             // Run background worker for finding polynom coeffs
             workerStep4.ProgressChanged += new ProgressChangedEventHandler(ProgressFindBestPolyChanged);
@@ -672,6 +672,7 @@ namespace Vibration_Analisys2 {
             dataGVBestPoly.Invoke(new Action<Size>((size) => dataGVBestPoly.Size = size), new Size(415, 354));
 
             workerStep4.DoWork -= new DoWorkEventHandler(FindBestPolynom);
+            workerStep4.Dispose();
         }
 
         /// <summary>
@@ -884,7 +885,7 @@ namespace Vibration_Analisys2 {
         /// <param name="coeffs"></param>
         /// <returns>Equation in string</returns>
         private string GetEquation(List<double> coeffs) {
-            string equation = "Y = " + coeffs[0];
+            string equation = "Y = " + Math.Round(coeffs[0], 4);
 
             for (int i = 1; i < coeffs.Count; i++) {
                 if (coeffs[i] < 0) {
@@ -905,10 +906,29 @@ namespace Vibration_Analisys2 {
             dataGVBestPoly.Rows.Add(row.Item1, row.Item2, row.Item3);
         }
 
-        private void SetDataGVColumnHeaders(List<string> headers, DataGridView dataGV) {
+        /// <summary>
+        /// Set column headers and column settings to dataGV
+        /// </summary>
+        /// <param name="headers">List of column headers</param>
+        /// <param name="dataGV">DataGridView</param>
+        /// <param name="autoSize">AutoSize column width</param>
+        private void SetDataGVColumnHeaders(List<string> headers, DataGridView dataGV, bool autoSize) {
             for (int i = 0; i < dataGV.Columns.Count; i++) {
                 dataGV.Columns[i].HeaderText = headers[i];
+                dataGV.Columns[i].SortMode = DataGridViewColumnSortMode.NotSortable;
+                if (autoSize) {
+                    dataGV.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+                }
             }
+        }
+
+        /// <summary>
+        /// Close excel connector
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e) {
+            xlapp.Quit();
         }
     }
 }

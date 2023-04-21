@@ -604,6 +604,9 @@
             // 
             // dataGVBestPoly
             // 
+            this.dataGVBestPoly.AllowUserToAddRows = false;
+            this.dataGVBestPoly.AllowUserToDeleteRows = false;
+            this.dataGVBestPoly.AllowUserToResizeRows = false;
             this.dataGVBestPoly.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGVBestPoly.Location = new System.Drawing.Point(436, 24);
             this.dataGVBestPoly.Name = "dataGVBestPoly";
@@ -740,6 +743,7 @@
             this.MinimumSize = new System.Drawing.Size(914, 495);
             this.Name = "MainForm";
             this.Text = "Анализ Вибросигнала";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGV)).EndInit();
