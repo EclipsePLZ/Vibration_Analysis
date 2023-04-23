@@ -11,35 +11,71 @@ namespace Vibration_Analisys2 {
         Microsoft.Office.Interop.Excel.Application xlapp = new Microsoft.Office.Interop.Excel.Application();
 
         /// <summary>
-        /// List for reference Fault values
+        /// List for reference fault values
         /// </summary>
-        List<double> referenceFault = new List<double> ();
-        List<double> selectIntervalRefFault = new List<double>();
-
-        (string, int) referenceFaultHeader;
+        public List<double> ReferenceFault { get; set; } = new List<double>();
 
         /// <summary>
-        /// List for second Fault values
+        /// List for second fault values
         /// </summary>
-        List<double> secondFault = new List<double>();
-        List<double> selectIntervalSecFault = new List<double>();
+        public List<double> SecondFault { get; set; } = new List<double>();
 
-        List<int> percentOfSecondFault = new List<int>();
+        /// <summary>
+        /// List for selected inverval reference fault values
+        /// </summary>
+        public List<double> SelectIntervalRefFault { get; set; } = new List<double>();
 
-        (string, int) secondFaultHeader;
+        /// <summary>
+        /// List for selected inverval second fault values
+        /// </summary>
+        public List<double> SelectIntervalSecFault { get; set; } = new List<double>();
 
-        string filenameExcel;
+        /// <summary>
+        /// Values before fault in reference fault
+        /// </summary>
+        public List<double> BeforeRefFault { get; set; } = new List<double>();
+
+        /// <summary>
+        /// Values before fault in second fault
+        /// </summary>
+        public List<double> BeforeSecFault { get; set; } = new List<double>();
+
+        /// <summary>
+        /// Header for reference fault
+        /// </summary>
+        public (string, int) ReferenceFaultHeader { get; set; }
+
+        /// <summary>
+        /// Header for second fault
+        /// </summary>
+        public (string, int) SecondFaultHeader { get; set; }
+
+        /// <summary>
+        /// Matrix of best polynom values
+        /// </summary>
+        public List<List<double>> BestPolynom { get; set; } = new List<List<double>>();
+
+        /// <summary>
+        /// Vector of best coefficients values
+        /// </summary>
+        public List<double> BestCoeffs { get; set; } = new List<double>();
+
+        /// <summary>
+        /// Filename of excel file with fault data
+        /// </summary>
+        public string FilenameExcel { get; set; }
+
+        /// <summary>
+        /// Max value of signal for normal work for second fault
+        /// </summary>
+        public double MaxNormalVibraitonSignalLevel { get; set; }
 
         // BackgroundWorkers for each step
         BackgroundWorker workerStep1 = new BackgroundWorker();
         BackgroundWorker workerStep2 = new BackgroundWorker();
         BackgroundWorker workerStep3 = new BackgroundWorker();
         BackgroundWorker workerStep4 = new BackgroundWorker();
-
-        /// <summary>
-        /// Max value of signal for normal work for second fault
-        /// </summary>
-        double maxNormalVibraitonSignalLevel;
+        BackgroundWorker workerStep5 = new BackgroundWorker();
 
 
         public MainForm() {
@@ -71,7 +107,7 @@ namespace Vibration_Analisys2 {
                 ofd.Filter = "Excel Files Only | *.xlsx; *.xls";
                 ofd.Title = "Choose the file";
                 if (ofd.ShowDialog() == DialogResult.OK) {
-                    filenameExcel = ofd.FileName;
+                    FilenameExcel = ofd.FileName;
 
                     // Run background worker for load data from excel file
                     workerStep1.ProgressChanged += new ProgressChangedEventHandler(ProgressExcelLoadChanged);
@@ -86,7 +122,7 @@ namespace Vibration_Analisys2 {
         }
 
         /// <summary>
-        /// Function for clear controls from step1
+        /// Function for clear controls on step1
         /// </summary>
         private void ClearControlsStep1() {
             dataGV.Rows.Clear();
@@ -97,7 +133,7 @@ namespace Vibration_Analisys2 {
         }
 
         /// <summary>
-        /// Function for clear controls from step2
+        /// Function for clear controls on step2
         /// </summary>
         private void ClearControlsStep2() {
             numberOfValuesForNormalWorkLevel.Value = 1;
@@ -112,7 +148,7 @@ namespace Vibration_Analisys2 {
         }
 
         /// <summary>
-        /// Function for clear controls from step3
+        /// Function for clear controls on step3
         /// </summary>
         private void ClearControlsStep3() {
             numericPieceOfRefFault.Value = 1;
@@ -124,7 +160,7 @@ namespace Vibration_Analisys2 {
         }
 
         /// <summary>
-        /// Function for clear controls from step4
+        /// Function for clear controls on step4
         /// </summary>
         private void ClearControlsStep4() {
             numberOfValuesInSelectedInterval.Text = "";
@@ -134,6 +170,17 @@ namespace Vibration_Analisys2 {
             dataGVBestPoly.Refresh();
             bestPolyDegreeValue.Text = "";
             bestDetermCoeffValue.Text = "";
+            ClearControlsStep5();
+        }
+
+        /// <summary>
+        /// Function for clear controls on step5
+        /// </summary>
+        private void ClearControlsStep5() { 
+            dataGVPredReliability.Rows.Clear();
+            dataGVPredReliability.Refresh();
+            numberOfValuesBeforeFault.Text = "";
+            valuesBeforeFault.Value = 1;
         }
 
         /// <summary>
@@ -142,7 +189,7 @@ namespace Vibration_Analisys2 {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void LoadData(object sender, DoWorkEventArgs e) {
-            Microsoft.Office.Interop.Excel.Workbook workbook = xlapp.Workbooks.Open(filenameExcel);
+            Microsoft.Office.Interop.Excel.Workbook workbook = xlapp.Workbooks.Open(FilenameExcel);
             Microsoft.Office.Interop.Excel.Worksheet sheet;
             Microsoft.Office.Interop.Excel.Range range;
             try {
@@ -255,21 +302,21 @@ namespace Vibration_Analisys2 {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void acceptFaultsButton_Click(object sender, EventArgs e) {
-            referenceFaultHeader = (referenceFaultBox.Text, referenceFaultBox.SelectedIndex + 1);
-            secondFaultHeader = (secondFaultBox.Text, secondFaultBox.SelectedIndex + 1);
-            referenceFault.Clear();
-            secondFault.Clear();
+            ReferenceFaultHeader = (referenceFaultBox.Text, referenceFaultBox.SelectedIndex + 1);
+            SecondFaultHeader = (secondFaultBox.Text, secondFaultBox.SelectedIndex + 1);
+            ReferenceFault.Clear();
+            SecondFault.Clear();
 
             try {
                 // Create second and reference fault lists
                 for (int rowNumber = 1; rowNumber < dataGV.Rows.Count; rowNumber++) {
-                    referenceFault.Add(Convert.ToDouble(dataGV[referenceFaultHeader.Item2, rowNumber].Value));
-                    secondFault.Add(Convert.ToDouble(dataGV[secondFaultHeader.Item2, rowNumber].Value));
+                    ReferenceFault.Add(Convert.ToDouble(dataGV[ReferenceFaultHeader.Item2, rowNumber].Value));
+                    SecondFault.Add(Convert.ToDouble(dataGV[SecondFaultHeader.Item2, rowNumber].Value));
                 }
                 step2.Enabled = true;
 
                 // Set maximum values for numeric up down
-                numberOfValuesForNormalWorkLevel.Maximum = secondFault.Count;
+                numberOfValuesForNormalWorkLevel.Maximum = SecondFault.Count;
                 numberOfStdForMaxLevel.Maximum = decimal.MaxValue;
 
                 allSteps.SelectTab(step2);
@@ -355,17 +402,17 @@ namespace Vibration_Analisys2 {
         private void calcReliabilitySignal_Click(object sender, EventArgs e) {
             int intervalSize = ((int)numberOfValuesForNormalWorkLevel.Value);
             double stdCount = ((double)numberOfStdForMaxLevel.Value);
-            double meanValueForInterval = secondFault.GetRange(0, intervalSize).Average();
-            double stdValueForInterval = StandardDeviation(secondFault.GetRange(0, intervalSize));
-            maxNormalVibraitonSignalLevel = meanValueForInterval + (double)stdCount * stdValueForInterval;
+            double meanValueForInterval = SecondFault.GetRange(0, intervalSize).Average();
+            double stdValueForInterval = StandardDeviation(SecondFault.GetRange(0, intervalSize));
+            MaxNormalVibraitonSignalLevel = meanValueForInterval + (double)stdCount * stdValueForInterval;
             
             meanValueForNormalWork.Text = meanValueForInterval.ToString();
             stdValueForNormalWork.Text = stdValueForInterval.ToString();
-            faultSignal.Text = secondFault.Max().ToString();
-            maxVibrationSignal.Text = maxNormalVibraitonSignalLevel.ToString();
+            faultSignal.Text = SecondFault.Max().ToString();
+            maxVibrationSignal.Text = MaxNormalVibraitonSignalLevel.ToString();
 
             getReliabilityForSecondSignal();
-            numericPieceOfRefFault.Maximum = referenceFault.Count();
+            numericPieceOfRefFault.Maximum = ReferenceFault.Count();
             step3.Enabled = true;
         }
 
@@ -374,7 +421,7 @@ namespace Vibration_Analisys2 {
         /// </summary>
         private void getReliabilityForSecondSignal() {
             dataSignalReliability.ColumnCount = 2;
-            SetDataGVColumnHeaders(new List<string>() { secondFaultHeader.Item1, "Надежность" }, dataSignalReliability, false);
+            SetDataGVColumnHeaders(new List<string>() { SecondFaultHeader.Item1, "Надежность" }, dataSignalReliability, false);
 
             // Run background worker for load values and reliability of choosen faults into dataGridView
             workerStep2.ProgressChanged += new ProgressChangedEventHandler(ProgressReliabilityChanged);
@@ -393,36 +440,36 @@ namespace Vibration_Analisys2 {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void getReliability(object sender, DoWorkEventArgs e) {
-            double maxSignalLevel = secondFault.Max();
+            double maxSignalLevel = SecondFault.Max();
 
             int numberOfDivisions = 0;
 
-            double oneDivision = (maxSignalLevel - maxNormalVibraitonSignalLevel) / 99;
+            double oneDivision = (maxSignalLevel - MaxNormalVibraitonSignalLevel) / 99;
 
             int progress = 0;
-            int step = secondFault.Count / 100;
+            int step = SecondFault.Count / 100;
             int oneBarInProgress = 1;
-            if (secondFault.Count < 100) {
+            if (SecondFault.Count < 100) {
                 step = 1;
-                oneBarInProgress = (100 / secondFault.Count) + 1;
+                oneBarInProgress = (100 / SecondFault.Count) + 1;
             }
             workerStep2.ReportProgress(progress);
 
-            double prevBiggestSignal = maxNormalVibraitonSignalLevel;
+            double prevBiggestSignal = MaxNormalVibraitonSignalLevel;
 
-            for (int i = 0; i < secondFault.Count; i++) {
+            for (int i = 0; i < SecondFault.Count; i++) {
                 // Find progress
                 if (i % step == 0) {
                     progress += oneBarInProgress;
                     workerStep2.ReportProgress(progress);
                 }
 
-                if (secondFault[i] > prevBiggestSignal) {
-                    prevBiggestSignal = secondFault[i];
-                    numberOfDivisions = (int)((secondFault[i] - (maxNormalVibraitonSignalLevel)) / oneDivision) + 1;
+                if (SecondFault[i] > prevBiggestSignal) {
+                    prevBiggestSignal = SecondFault[i];
+                    numberOfDivisions = (int)((SecondFault[i] - (MaxNormalVibraitonSignalLevel)) / oneDivision) + 1;
                 }
 
-                dataSignalReliability.Invoke(new Action<(double, int)>((s) => AddValuePercent(s)), (secondFault[i], numberOfDivisions));
+                dataSignalReliability.Invoke(new Action<(double, int)>((s) => AddValuePercent(s)), (SecondFault[i], numberOfDivisions));
             }
 
             progressBarReliability.Invoke(new Action<bool>((b) => progressBarReliability.Visible = b), false);
@@ -437,7 +484,6 @@ namespace Vibration_Analisys2 {
         /// <param name="values">value and percent of reliability</param>
         private void AddValuePercent((double, int) values) {
             int reliability = 100 - values.Item2;
-            percentOfSecondFault.Add(reliability);
             dataSignalReliability.Rows.Add(values.Item1, reliability.ToString() + "%");
         }
 
@@ -473,12 +519,12 @@ namespace Vibration_Analisys2 {
         private void maxPearsonCoefTwoFaultsButton_Click(object sender, EventArgs e) {
             int numberOfValuesInFault = (int)numericPieceOfRefFault.Value;
 
-            selectIntervalRefFault = new List<double>(referenceFault.GetRange(0, numberOfValuesInFault));
+            SelectIntervalRefFault = new List<double>(ReferenceFault.GetRange(0, numberOfValuesInFault));
             double bestCorrCoef = 0;
             int bestStartIndexSecFault = 0;
 
-            for (int i = 0; i < (secondFault.Count - numberOfValuesInFault); i++) {
-                double corrCoef = CorrelCoef(selectIntervalRefFault, secondFault.GetRange(i, numberOfValuesInFault));
+            for (int i = 0; i < (SecondFault.Count - numberOfValuesInFault); i++) {
+                double corrCoef = CorrelCoef(SelectIntervalRefFault, SecondFault.GetRange(i, numberOfValuesInFault));
                 if (Math.Abs(corrCoef) > Math.Abs(bestCorrCoef)) {
                     bestCorrCoef = corrCoef;
                     bestStartIndexSecFault = i;
@@ -488,17 +534,17 @@ namespace Vibration_Analisys2 {
             bestCorrelCoefTextBox.Text = bestCorrCoef.ToString();
             bestIndexSecFaultTextBox.Text = (bestStartIndexSecFault + 1).ToString();
 
-            selectIntervalRefFault = new List<double>(referenceFault.GetRange(0, secondFault.Count - bestStartIndexSecFault));
-            selectIntervalSecFault = new List<double>(secondFault.GetRange(bestStartIndexSecFault, secondFault.Count - bestStartIndexSecFault));
+            SelectIntervalRefFault = new List<double>(ReferenceFault.GetRange(0, SecondFault.Count - bestStartIndexSecFault));
+            SelectIntervalSecFault = new List<double>(SecondFault.GetRange(bestStartIndexSecFault, SecondFault.Count - bestStartIndexSecFault));
 
             WriteBestIntervalsIntoDataGridView();
             step4.Enabled = true;
 
-            numberOfValuesInSelectedInterval.Text = selectIntervalSecFault.Count.ToString();
-            numberOfValuesForPolynomes.Maximum = selectIntervalSecFault.Count;
+            numberOfValuesInSelectedInterval.Text = SelectIntervalSecFault.Count.ToString();
+            numberOfValuesForPolynomes.Maximum = SelectIntervalSecFault.Count;
             maxPolynomDegree.Value = 15;
 
-            numberOfValuesForPolynomes.Value = selectIntervalSecFault.Count;
+            numberOfValuesForPolynomes.Value = SelectIntervalSecFault.Count;
         }
 
         /// <summary>
@@ -517,7 +563,7 @@ namespace Vibration_Analisys2 {
         /// </summary>
         private void WriteBestIntervalsIntoDataGridView() {
             dataGVbestIntervalsOfFault.ColumnCount = 2;
-            SetDataGVColumnHeaders(new List<string>() { referenceFaultHeader.Item1, secondFaultHeader.Item1 }, dataGVbestIntervalsOfFault, false);
+            SetDataGVColumnHeaders(new List<string>() { ReferenceFaultHeader.Item1, SecondFaultHeader.Item1 }, dataGVbestIntervalsOfFault, false);
 
             // Run background worker for load best intervals of reference and second fault
             workerStep3.ProgressChanged += new ProgressChangedEventHandler(ProgressSelectIntervalChanged);
@@ -550,22 +596,22 @@ namespace Vibration_Analisys2 {
         /// <param name="e"></param>
         private void WriteBestIntervalsToDataGridAsync(object sender, DoWorkEventArgs e) {
             int progress = 0;
-            int step = selectIntervalRefFault.Count / 100;
+            int step = SelectIntervalRefFault.Count / 100;
             int oneBarInProgress = 1;
-            if (selectIntervalRefFault.Count < 100) {
+            if (SelectIntervalRefFault.Count < 100) {
                 step = 1;
-                oneBarInProgress = (100 / selectIntervalRefFault.Count) + 1;
+                oneBarInProgress = (100 / SelectIntervalRefFault.Count) + 1;
             }
             workerStep3.ReportProgress(progress);
 
-            for (int i = 0; i < selectIntervalRefFault.Count; i++) {
+            for (int i = 0; i < SelectIntervalRefFault.Count; i++) {
                 // Find progress
                 if (i % step == 0) {
                     progress += oneBarInProgress;
                     workerStep3.ReportProgress(progress);
                 }
 
-                (double, double) newRow = (selectIntervalRefFault[i], selectIntervalSecFault[i]);
+                (double, double) newRow = (SelectIntervalRefFault[i], SelectIntervalSecFault[i]);
                 dataGVbestIntervalsOfFault.Invoke(new Action<(double, double)>((values) => WriteRowOfBestInterval(values)), newRow);
             }
 
@@ -604,6 +650,13 @@ namespace Vibration_Analisys2 {
             progressBestPoly.Value = 0;
             progressBestPoly.Visible = true;
             workerStep4.RunWorkerAsync();
+
+            step5.Enabled = true;
+
+            int valuesCountBeforeFault = Math.Min(ReferenceFault.IndexOf(ReferenceFault.Max()), SecondFault.IndexOf(ReferenceFault.Max()));
+            numberOfValuesBeforeFault.Text = valuesCountBeforeFault.ToString();
+            valuesBeforeFault.Maximum = valuesCountBeforeFault;
+            numberOfValuesForNormalWorkPredict.Maximum = valuesCountBeforeFault;
         }
 
         /// <summary>
@@ -618,10 +671,10 @@ namespace Vibration_Analisys2 {
             double bestDetermCoef = 0;
 
             // New selected intervals of faults
-            selectIntervalRefFault = new List<double>(selectIntervalRefFault.GetRange(0, numberValuesForPolynom));
-            selectIntervalSecFault = new List<double>(selectIntervalSecFault.GetRange(0, numberValuesForPolynom));
+            SelectIntervalRefFault = new List<double>(SelectIntervalRefFault.GetRange(0, numberValuesForPolynom));
+            SelectIntervalSecFault = new List<double>(SelectIntervalSecFault.GetRange(0, numberValuesForPolynom));
 
-            List<double> Y = new List<double>(selectIntervalSecFault);
+            List<double> Y = new List<double>(SelectIntervalSecFault);
             List<List<double>> Z = new List<List<double>>();
             List<List<double>> coeffVectors = new List<List<double>>();
 
@@ -644,7 +697,7 @@ namespace Vibration_Analisys2 {
                     workerStep4.ReportProgress(progress);
                 }
 
-                Z.Add(PowList(selectIntervalRefFault, i));
+                Z.Add(PowList(SelectIntervalRefFault, i));
 
                 // Find vector of coefficients
                 List<double> coeffVector = FindVectorOfCoeffs(Z, Y);
@@ -653,6 +706,9 @@ namespace Vibration_Analisys2 {
                 double determCoeff = GetDetermCoeff(Z, coeffVector, Y);
 
                 if (determCoeff > bestDetermCoef) {
+                    BestPolynom = new List<List<double>>(Z);
+                    BestCoeffs = new List<double>(coeffVector);
+
                     bestDetermCoef = determCoeff;
                     bestPolynomialDegree = i;
                 }
@@ -929,6 +985,95 @@ namespace Vibration_Analisys2 {
         /// <param name="e"></param>
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e) {
             xlapp.Quit();
+        }
+
+        /// <summary>
+        /// Get predicted reliability
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void GetPredictedReliability_Click(object sender, EventArgs e) {
+            SetDataGVColumnHeaders(new List<string>() { "Реальные значения аварии", "Реальные значения надежности", "Предсказанные значения", "Предсказанная надежность" }, dataGVPredReliability, true);
+
+            // Run background worker for calc predicted fault values
+            workerStep5.ProgressChanged += new ProgressChangedEventHandler(ProgressCalcPredValuesChanged);
+            workerStep5.DoWork += new DoWorkEventHandler(FindPredictedValuesReliability);
+            workerStep5.WorkerReportsProgress = true;
+            dataGVPredReliability.Size = new Size(490, 329);
+            predReliableProgress.Value = 0;
+            predReliableProgress.Visible = true;
+            workerStep5.RunWorkerAsync();
+        }
+
+        /// <summary>
+        /// Change progress bar value for select interval bar
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ProgressCalcPredValuesChanged(object sender, ProgressChangedEventArgs e) {
+            if (e.ProgressPercentage > 100) {
+                predReliableProgress.Value = 100;
+            }
+            else {
+                predReliableProgress.Value = e.ProgressPercentage;
+            }
+        }
+
+        /// <summary>
+        /// Function for finding predicted values of reliability
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void FindPredictedValuesReliability(object sender, DoWorkEventArgs e) {
+            int countBeforeFault = (int)valuesBeforeFault.Value;
+            //int intervalSize = (int)
+
+            BeforeRefFault = new List<double>(ReferenceFault.GetRange(ReferenceFault.IndexOf(ReferenceFault.Max()) - countBeforeFault, countBeforeFault + 1));
+            BeforeSecFault = new List<double>(SecondFault.GetRange(SecondFault.IndexOf(SecondFault.Max()) - countBeforeFault, countBeforeFault + 1));
+
+
+
+            //int intervalSize = ((int)numberOfValuesForNormalWorkLevel.Value);
+            //double stdCount = ((double)numberOfStdForMaxLevel.Value);
+            //double meanValueForInterval = SecondFault.GetRange(0, intervalSize).Average();
+            //double stdValueForInterval = StandardDeviation(SecondFault.GetRange(0, intervalSize));
+            //MaxNormalVibraitonSignalLevel = meanValueForInterval + (double)stdCount * stdValueForInterval;
+
+            //meanValueForNormalWork.Text = meanValueForInterval.ToString();
+            //stdValueForNormalWork.Text = stdValueForInterval.ToString();
+            //faultSignal.Text = SecondFault.Max().ToString();
+            //maxVibrationSignal.Text = MaxNormalVibraitonSignalLevel.ToString();
+
+            //getReliabilityForSecondSignal();
+            //numericPieceOfRefFault.Maximum = ReferenceFault.Count();
+        }
+
+        private void numberOfValuesForNormalWorkPredict_ValueChanged(object sender, EventArgs e) {
+            CheckStep5Rule();
+        }
+
+        private void valuesBeforeFault_ValueChanged(object sender, EventArgs e) {
+            CheckStep5Rule();
+        }
+
+        /// <summary>
+        /// Check the rule
+        /// </summary>
+        private void CheckStep5Rule() {
+            if (Step5Rule()) {
+                GetPredictedReliability.Enabled = true;
+            }
+            else {
+                GetPredictedReliability.Enabled = false;
+            }
+        }
+
+        /// <summary>
+        /// Rule about number of values for predicted
+        /// </summary>
+        /// <returns></returns>
+        private bool Step5Rule() {
+            return numberOfValuesForNormalWorkPredict.Value <= valuesBeforeFault.Value;
         }
     }
 }

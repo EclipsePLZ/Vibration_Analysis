@@ -65,6 +65,12 @@
             this.maxPearsonCoefTwoFaultsButton = new System.Windows.Forms.Button();
             this.label9 = new System.Windows.Forms.Label();
             this.step4 = new System.Windows.Forms.TabPage();
+            this.label17 = new System.Windows.Forms.Label();
+            this.bestEquation = new System.Windows.Forms.TextBox();
+            this.label16 = new System.Windows.Forms.Label();
+            this.bestDetermCoeffValue = new System.Windows.Forms.TextBox();
+            this.label15 = new System.Windows.Forms.Label();
+            this.bestPolyDegreeValue = new System.Windows.Forms.TextBox();
             this.maxPolynomDegree = new System.Windows.Forms.NumericUpDown();
             this.label14 = new System.Windows.Forms.Label();
             this.progressBestPoly = new System.Windows.Forms.ProgressBar();
@@ -74,13 +80,20 @@
             this.label13 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
             this.numberOfValuesInSelectedInterval = new System.Windows.Forms.TextBox();
+            this.step5 = new System.Windows.Forms.TabPage();
+            this.GetPredictedReliability = new System.Windows.Forms.Button();
+            this.predReliableProgress = new System.Windows.Forms.ProgressBar();
+            this.dataGVPredReliability = new System.Windows.Forms.DataGridView();
             this.errorProvider1 = new System.Windows.Forms.ErrorProvider(this.components);
-            this.label15 = new System.Windows.Forms.Label();
-            this.bestPolyDegreeValue = new System.Windows.Forms.TextBox();
-            this.label16 = new System.Windows.Forms.Label();
-            this.bestDetermCoeffValue = new System.Windows.Forms.TextBox();
-            this.label17 = new System.Windows.Forms.Label();
-            this.bestEquation = new System.Windows.Forms.TextBox();
+            this.label18 = new System.Windows.Forms.Label();
+            this.numberOfValuesBeforeFault = new System.Windows.Forms.TextBox();
+            this.valuesBeforeFault = new System.Windows.Forms.NumericUpDown();
+            this.label19 = new System.Windows.Forms.Label();
+            this.numberOfValuesForNormalWorkPredict = new System.Windows.Forms.NumericUpDown();
+            this.label20 = new System.Windows.Forms.Label();
+            this.label21 = new System.Windows.Forms.Label();
+            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            this.label22 = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGV)).BeginInit();
             this.allSteps.SuspendLayout();
@@ -96,7 +109,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.maxPolynomDegree)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGVBestPoly)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numberOfValuesForPolynomes)).BeginInit();
+            this.step5.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGVPredReliability)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.valuesBeforeFault)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numberOfValuesForNormalWorkPredict)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -123,7 +141,7 @@
             // openExcelFile
             // 
             this.openExcelFile.Name = "openExcelFile";
-            this.openExcelFile.Size = new System.Drawing.Size(180, 22);
+            this.openExcelFile.Size = new System.Drawing.Size(121, 22);
             this.openExcelFile.Text = "Открыть";
             this.openExcelFile.Click += new System.EventHandler(this.openExcelFile_Click);
             // 
@@ -138,6 +156,7 @@
             // 
             this.dataGV.AllowUserToAddRows = false;
             this.dataGV.AllowUserToDeleteRows = false;
+            this.dataGV.AllowUserToResizeRows = false;
             this.dataGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGV.Location = new System.Drawing.Point(6, 5);
             this.dataGV.Name = "dataGV";
@@ -190,6 +209,7 @@
             this.allSteps.Controls.Add(this.step2);
             this.allSteps.Controls.Add(this.step3);
             this.allSteps.Controls.Add(this.step4);
+            this.allSteps.Controls.Add(this.step5);
             this.allSteps.Location = new System.Drawing.Point(12, 27);
             this.allSteps.Name = "allSteps";
             this.allSteps.SelectedIndex = 0;
@@ -287,6 +307,9 @@
             // 
             // dataSignalReliability
             // 
+            this.dataSignalReliability.AllowUserToAddRows = false;
+            this.dataSignalReliability.AllowUserToDeleteRows = false;
+            this.dataSignalReliability.AllowUserToResizeRows = false;
             this.dataSignalReliability.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataSignalReliability.Location = new System.Drawing.Point(493, 28);
             this.dataSignalReliability.Name = "dataSignalReliability";
@@ -452,6 +475,9 @@
             // 
             // dataGVbestIntervalsOfFault
             // 
+            this.dataGVbestIntervalsOfFault.AllowUserToAddRows = false;
+            this.dataGVbestIntervalsOfFault.AllowUserToDeleteRows = false;
+            this.dataGVbestIntervalsOfFault.AllowUserToResizeRows = false;
             this.dataGVbestIntervalsOfFault.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGVbestIntervalsOfFault.Location = new System.Drawing.Point(486, 19);
             this.dataGVbestIntervalsOfFault.Name = "dataGVbestIntervalsOfFault";
@@ -560,6 +586,57 @@
             this.step4.TabIndex = 3;
             this.step4.Text = "Шаг 4";
             this.step4.UseVisualStyleBackColor = true;
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(52, 266);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(104, 13);
+            this.label17.TabIndex = 26;
+            this.label17.Text = "Лучшее уравнение:";
+            // 
+            // bestEquation
+            // 
+            this.bestEquation.Location = new System.Drawing.Point(51, 282);
+            this.bestEquation.Name = "bestEquation";
+            this.bestEquation.ReadOnly = true;
+            this.bestEquation.Size = new System.Drawing.Size(275, 20);
+            this.bestEquation.TabIndex = 25;
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(52, 222);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(173, 26);
+            this.label16.TabIndex = 24;
+            this.label16.Text = "Лучшее значение коэффициента\r\nдетерминации:";
+            // 
+            // bestDetermCoeffValue
+            // 
+            this.bestDetermCoeffValue.Location = new System.Drawing.Point(226, 228);
+            this.bestDetermCoeffValue.Name = "bestDetermCoeffValue";
+            this.bestDetermCoeffValue.ReadOnly = true;
+            this.bestDetermCoeffValue.Size = new System.Drawing.Size(100, 20);
+            this.bestDetermCoeffValue.TabIndex = 23;
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(52, 193);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(163, 13);
+            this.label15.TabIndex = 22;
+            this.label15.Text = "Наилучшая степень полинома:";
+            // 
+            // bestPolyDegreeValue
+            // 
+            this.bestPolyDegreeValue.Location = new System.Drawing.Point(226, 190);
+            this.bestPolyDegreeValue.Name = "bestPolyDegreeValue";
+            this.bestPolyDegreeValue.ReadOnly = true;
+            this.bestPolyDegreeValue.Size = new System.Drawing.Size(100, 20);
+            this.bestPolyDegreeValue.TabIndex = 21;
             // 
             // maxPolynomDegree
             // 
@@ -675,60 +752,187 @@
             this.numberOfValuesInSelectedInterval.Size = new System.Drawing.Size(100, 20);
             this.numberOfValuesInSelectedInterval.TabIndex = 10;
             // 
+            // step5
+            // 
+            this.step5.Controls.Add(this.numericUpDown1);
+            this.step5.Controls.Add(this.label22);
+            this.step5.Controls.Add(this.label21);
+            this.step5.Controls.Add(this.numberOfValuesForNormalWorkPredict);
+            this.step5.Controls.Add(this.label20);
+            this.step5.Controls.Add(this.valuesBeforeFault);
+            this.step5.Controls.Add(this.label19);
+            this.step5.Controls.Add(this.label18);
+            this.step5.Controls.Add(this.numberOfValuesBeforeFault);
+            this.step5.Controls.Add(this.GetPredictedReliability);
+            this.step5.Controls.Add(this.predReliableProgress);
+            this.step5.Controls.Add(this.dataGVPredReliability);
+            this.step5.Location = new System.Drawing.Point(4, 22);
+            this.step5.Name = "step5";
+            this.step5.Size = new System.Drawing.Size(879, 406);
+            this.step5.TabIndex = 4;
+            this.step5.Text = "Шаг 5";
+            this.step5.UseVisualStyleBackColor = true;
+            // 
+            // GetPredictedReliability
+            // 
+            this.GetPredictedReliability.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.GetPredictedReliability.Location = new System.Drawing.Point(80, 318);
+            this.GetPredictedReliability.Name = "GetPredictedReliability";
+            this.GetPredictedReliability.Size = new System.Drawing.Size(154, 59);
+            this.GetPredictedReliability.TabIndex = 19;
+            this.GetPredictedReliability.Text = "Вычислить коэффициенты надежности";
+            this.GetPredictedReliability.UseVisualStyleBackColor = true;
+            this.GetPredictedReliability.Click += new System.EventHandler(this.GetPredictedReliability_Click);
+            // 
+            // predReliableProgress
+            // 
+            this.predReliableProgress.Location = new System.Drawing.Point(384, 358);
+            this.predReliableProgress.Margin = new System.Windows.Forms.Padding(2);
+            this.predReliableProgress.Name = "predReliableProgress";
+            this.predReliableProgress.Size = new System.Drawing.Size(456, 19);
+            this.predReliableProgress.TabIndex = 18;
+            this.predReliableProgress.Visible = false;
+            // 
+            // dataGVPredReliability
+            // 
+            this.dataGVPredReliability.AllowUserToAddRows = false;
+            this.dataGVPredReliability.AllowUserToDeleteRows = false;
+            this.dataGVPredReliability.AllowUserToResizeRows = false;
+            this.dataGVPredReliability.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGVPredReliability.Location = new System.Drawing.Point(384, 24);
+            this.dataGVPredReliability.Name = "dataGVPredReliability";
+            this.dataGVPredReliability.ReadOnly = true;
+            this.dataGVPredReliability.RowHeadersWidth = 51;
+            this.dataGVPredReliability.Size = new System.Drawing.Size(456, 353);
+            this.dataGVPredReliability.TabIndex = 17;
+            // 
             // errorProvider1
             // 
             this.errorProvider1.ContainerControl = this;
             // 
-            // label15
+            // label18
             // 
-            this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(52, 193);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(163, 13);
-            this.label15.TabIndex = 22;
-            this.label15.Text = "Наилучшая степень полинома:";
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(40, 37);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(131, 26);
+            this.label18.TabIndex = 21;
+            this.label18.Text = "Количество наблюдений\r\nдо аварии:";
             // 
-            // bestPolyDegreeValue
+            // numberOfValuesBeforeFault
             // 
-            this.bestPolyDegreeValue.Location = new System.Drawing.Point(226, 190);
-            this.bestPolyDegreeValue.Name = "bestPolyDegreeValue";
-            this.bestPolyDegreeValue.ReadOnly = true;
-            this.bestPolyDegreeValue.Size = new System.Drawing.Size(100, 20);
-            this.bestPolyDegreeValue.TabIndex = 21;
+            this.numberOfValuesBeforeFault.Location = new System.Drawing.Point(234, 43);
+            this.numberOfValuesBeforeFault.Name = "numberOfValuesBeforeFault";
+            this.numberOfValuesBeforeFault.ReadOnly = true;
+            this.numberOfValuesBeforeFault.Size = new System.Drawing.Size(100, 20);
+            this.numberOfValuesBeforeFault.TabIndex = 20;
             // 
-            // label16
+            // valuesBeforeFault
             // 
-            this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(52, 222);
-            this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(173, 26);
-            this.label16.TabIndex = 24;
-            this.label16.Text = "Лучшее значение коэффициента\r\nдетерминации:";
+            this.valuesBeforeFault.Location = new System.Drawing.Point(234, 110);
+            this.valuesBeforeFault.Maximum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.valuesBeforeFault.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.valuesBeforeFault.Name = "valuesBeforeFault";
+            this.valuesBeforeFault.Size = new System.Drawing.Size(120, 20);
+            this.valuesBeforeFault.TabIndex = 23;
+            this.valuesBeforeFault.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.valuesBeforeFault.ValueChanged += new System.EventHandler(this.valuesBeforeFault_ValueChanged);
+            this.valuesBeforeFault.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.numberOfValuesForNormalWorkLevel_KeyPress);
             // 
-            // bestDetermCoeffValue
+            // label19
             // 
-            this.bestDetermCoeffValue.Location = new System.Drawing.Point(226, 228);
-            this.bestDetermCoeffValue.Name = "bestDetermCoeffValue";
-            this.bestDetermCoeffValue.ReadOnly = true;
-            this.bestDetermCoeffValue.Size = new System.Drawing.Size(100, 20);
-            this.bestDetermCoeffValue.TabIndex = 23;
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(29, 104);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(185, 26);
+            this.label19.TabIndex = 22;
+            this.label19.Text = "Количество наблюдений до аварии\r\nдля предсказания надежности:";
             // 
-            // label17
+            // numberOfValuesForNormalWorkPredict
             // 
-            this.label17.AutoSize = true;
-            this.label17.Location = new System.Drawing.Point(52, 266);
-            this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(104, 13);
-            this.label17.TabIndex = 26;
-            this.label17.Text = "Лучшее уравнение:";
+            this.numberOfValuesForNormalWorkPredict.Location = new System.Drawing.Point(234, 165);
+            this.numberOfValuesForNormalWorkPredict.Maximum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numberOfValuesForNormalWorkPredict.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numberOfValuesForNormalWorkPredict.Name = "numberOfValuesForNormalWorkPredict";
+            this.numberOfValuesForNormalWorkPredict.Size = new System.Drawing.Size(120, 20);
+            this.numberOfValuesForNormalWorkPredict.TabIndex = 25;
+            this.numberOfValuesForNormalWorkPredict.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numberOfValuesForNormalWorkPredict.ValueChanged += new System.EventHandler(this.numberOfValuesForNormalWorkPredict_ValueChanged);
+            this.numberOfValuesForNormalWorkPredict.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.numberOfValuesForNormalWorkLevel_KeyPress);
             // 
-            // bestEquation
+            // label20
             // 
-            this.bestEquation.Location = new System.Drawing.Point(51, 282);
-            this.bestEquation.Name = "bestEquation";
-            this.bestEquation.ReadOnly = true;
-            this.bestEquation.Size = new System.Drawing.Size(275, 20);
-            this.bestEquation.TabIndex = 25;
+            this.label20.AutoSize = true;
+            this.label20.Location = new System.Drawing.Point(29, 159);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(0, 13);
+            this.label20.TabIndex = 24;
+            // 
+            // label21
+            // 
+            this.label21.AutoSize = true;
+            this.label21.Location = new System.Drawing.Point(29, 159);
+            this.label21.Name = "label21";
+            this.label21.Size = new System.Drawing.Size(199, 26);
+            this.label21.TabIndex = 26;
+            this.label21.Text = "Количество наблюдений для\r\nподсчета уровня нормальной работы:";
+            // 
+            // numericUpDown1
+            // 
+            this.numericUpDown1.DecimalPlaces = 1;
+            this.numericUpDown1.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            this.numericUpDown1.Location = new System.Drawing.Point(287, 222);
+            this.numericUpDown1.Maximum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numericUpDown1.Name = "numericUpDown1";
+            this.numericUpDown1.Size = new System.Drawing.Size(120, 20);
+            this.numericUpDown1.TabIndex = 28;
+            this.numericUpDown1.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // label22
+            // 
+            this.label22.AutoSize = true;
+            this.label22.Location = new System.Drawing.Point(29, 216);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(246, 26);
+            this.label22.TabIndex = 27;
+            this.label22.Text = "Количество стандартных отклонения для\r\nподсчета максимального допустимого уровня:" +
+    "";
             // 
             // MainForm
             // 
@@ -764,7 +968,13 @@
             ((System.ComponentModel.ISupportInitialize)(this.maxPolynomDegree)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGVBestPoly)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numberOfValuesForPolynomes)).EndInit();
+            this.step5.ResumeLayout(false);
+            this.step5.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGVPredReliability)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.valuesBeforeFault)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numberOfValuesForNormalWorkPredict)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -828,6 +1038,19 @@
         private System.Windows.Forms.TextBox bestPolyDegreeValue;
         private System.Windows.Forms.Label label17;
         private System.Windows.Forms.TextBox bestEquation;
+        private System.Windows.Forms.TabPage step5;
+        private System.Windows.Forms.Button GetPredictedReliability;
+        private System.Windows.Forms.ProgressBar predReliableProgress;
+        private System.Windows.Forms.DataGridView dataGVPredReliability;
+        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.TextBox numberOfValuesBeforeFault;
+        private System.Windows.Forms.NumericUpDown valuesBeforeFault;
+        private System.Windows.Forms.Label label19;
+        private System.Windows.Forms.NumericUpDown numberOfValuesForNormalWorkPredict;
+        private System.Windows.Forms.Label label20;
+        private System.Windows.Forms.Label label21;
+        private System.Windows.Forms.NumericUpDown numericUpDown1;
+        private System.Windows.Forms.Label label22;
     }
 }
 
