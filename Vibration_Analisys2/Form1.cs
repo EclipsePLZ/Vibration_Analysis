@@ -51,11 +51,6 @@ namespace Vibration_Analisys2 {
         public (string, int) SecondFaultHeader { get; set; }
 
         /// <summary>
-        /// Matrix of best polynom values
-        /// </summary>
-        public List<List<double>> BestPolynom { get; set; } = new List<List<double>>();
-
-        /// <summary>
         /// Vector of best coefficients values
         /// </summary>
         public List<double> BestCoeffs { get; set; } = new List<double>();
@@ -91,6 +86,8 @@ namespace Vibration_Analisys2 {
             step1.Enabled = true;
 
             maxPolynomDegree.Maximum = Decimal.MaxValue;
+            numberOfStdForMaxLevel.Maximum = Decimal.MaxValue;
+            numberOfStdInPredicted.Maximum = Decimal.MaxValue;
         }
 
         /// <summary>
@@ -317,7 +314,7 @@ namespace Vibration_Analisys2 {
 
                 // Set maximum values for numeric up down
                 numberOfValuesForNormalWorkLevel.Maximum = SecondFault.Count;
-                numberOfStdForMaxLevel.Maximum = decimal.MaxValue;
+                
 
                 allSteps.SelectTab(step2);
             }
@@ -401,10 +398,9 @@ namespace Vibration_Analisys2 {
         /// <param name="e"></param>
         private void calcReliabilitySignal_Click(object sender, EventArgs e) {
             int intervalSize = ((int)numberOfValuesForNormalWorkLevel.Value);
-            double stdCount = ((double)numberOfStdForMaxLevel.Value);
             double meanValueForInterval = SecondFault.GetRange(0, intervalSize).Average();
             double stdValueForInterval = StandardDeviation(SecondFault.GetRange(0, intervalSize));
-            MaxNormalVibraitonSignalLevel = meanValueForInterval + (double)stdCount * stdValueForInterval;
+            MaxNormalVibraitonSignalLevel = GetMaxNormalVibrLevel(SecondFault.GetRange(0, intervalSize), (double)numberOfStdForMaxLevel.Value);
             
             meanValueForNormalWork.Text = meanValueForInterval.ToString();
             stdValueForNormalWork.Text = stdValueForInterval.ToString();
@@ -414,6 +410,18 @@ namespace Vibration_Analisys2 {
             getReliabilityForSecondSignal();
             numericPieceOfRefFault.Maximum = ReferenceFault.Count();
             step3.Enabled = true;
+        }
+
+        /// <summary>
+        /// Find Max normal vibration level for vibration signal
+        /// </summary>
+        /// <param name="signal">Vibration signal</param>
+        /// <param name="stdCount">Count of stds</param>
+        /// <returns>Max normal vibration level</returns>
+        private double GetMaxNormalVibrLevel(List<double> signal, double stdCount) {
+            double stdValue = StandardDeviation(signal);
+            double meanValue = signal.Average();
+            return meanValue + stdCount * stdValue;
         }
 
         /// <summary>
@@ -653,7 +661,7 @@ namespace Vibration_Analisys2 {
 
             step5.Enabled = true;
 
-            int valuesCountBeforeFault = Math.Min(ReferenceFault.IndexOf(ReferenceFault.Max()), SecondFault.IndexOf(ReferenceFault.Max()));
+            int valuesCountBeforeFault = ReferenceFault.IndexOf(ReferenceFault.Max());
             numberOfValuesBeforeFault.Text = valuesCountBeforeFault.ToString();
             valuesBeforeFault.Maximum = valuesCountBeforeFault;
             numberOfValuesForNormalWorkPredict.Maximum = valuesCountBeforeFault;
@@ -706,7 +714,6 @@ namespace Vibration_Analisys2 {
                 double determCoeff = GetDetermCoeff(Z, coeffVector, Y);
 
                 if (determCoeff > bestDetermCoef) {
-                    BestPolynom = new List<List<double>>(Z);
                     BestCoeffs = new List<double>(coeffVector);
 
                     bestDetermCoef = determCoeff;
@@ -999,7 +1006,7 @@ namespace Vibration_Analisys2 {
             workerStep5.ProgressChanged += new ProgressChangedEventHandler(ProgressCalcPredValuesChanged);
             workerStep5.DoWork += new DoWorkEventHandler(FindPredictedValuesReliability);
             workerStep5.WorkerReportsProgress = true;
-            dataGVPredReliability.Size = new Size(490, 329);
+            dataGVPredReliability.Size = new Size(392, 329);
             predReliableProgress.Value = 0;
             predReliableProgress.Visible = true;
             workerStep5.RunWorkerAsync();
@@ -1020,18 +1027,47 @@ namespace Vibration_Analisys2 {
         }
 
         /// <summary>
-        /// Function for finding predicted values of reliability
+        /// Background function for finding predicted values of reliability
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void FindPredictedValuesReliability(object sender, DoWorkEventArgs e) {
             int countBeforeFault = (int)valuesBeforeFault.Value;
-            //int intervalSize = (int)
+            int intervalSize = (int)numberOfValuesForNormalWorkPredict.Value;
+            double numberOfStd = (double)numberOfStdInPredicted.Value;
 
-            BeforeRefFault = new List<double>(ReferenceFault.GetRange(ReferenceFault.IndexOf(ReferenceFault.Max()) - countBeforeFault, countBeforeFault + 1));
-            BeforeSecFault = new List<double>(SecondFault.GetRange(SecondFault.IndexOf(SecondFault.Max()) - countBeforeFault, countBeforeFault + 1));
+            // Create polynom for predict
+            List<double> valuesForPredict = new List<double>(ReferenceFault.GetRange(Convert.ToInt32(numberOfValuesBeforeFault.Text) - countBeforeFault, countBeforeFault + 1));
+            List<List<double>> predictPolynom = new List<List<double>>();
+            predictPolynom.Add(OnesList(countBeforeFault));
 
+            for (int i = 1; i <= Convert.ToInt32(bestPolyDegreeValue.Text); i++) {
+                predictPolynom.Add(PowList(valuesForPredict, i));
+            }
 
+            // Get predicted and real second falut values
+            List<double> predictedSecond = new List<double>(GetPredicted(predictPolynom, BestCoeffs));
+            List<double> realSecond = new List<double>(SecondFault.GetRange(SecondFault.IndexOf(SecondFault.Max()) - countBeforeFault, countBeforeFault + 1));
+
+            // Get max normal level for predicted and real second fault
+            double predictMaxNormLevel = GetMaxNormalVibrLevel(predictedSecond.GetRange(0, intervalSize), numberOfStd);
+            double realMaxNormLevel = GetMaxNormalVibrLevel(realSecond.GetRange(0, intervalSize), numberOfStd);
+
+            // Get max levels for perdicted and real second fault
+            double predictMaxLevel = predictedSecond.Max();
+            double realMaxLevel = realSecond.Max();
+
+            // Get one divisions for predicted and real second fault
+            double predictOneDivision = (predictMaxLevel - predictMaxNormLevel) / 99;
+            double realOneDivision = (realMaxLevel - realMaxNormLevel) / 99;
+
+            int progress = 0;
+            int step = predictedSecond.Count / 100;
+            int oneBarInProgress = 1;
+            if (predictedSecond.Count < 100) {
+                step = 1;
+                oneBarInProgress = (100 / predictedSecond.Count) + 1;
+            }
 
             //int intervalSize = ((int)numberOfValuesForNormalWorkLevel.Value);
             //double stdCount = ((double)numberOfStdForMaxLevel.Value);

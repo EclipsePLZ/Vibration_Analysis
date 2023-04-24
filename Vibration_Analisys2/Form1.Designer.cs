@@ -92,7 +92,7 @@
             this.numberOfValuesForNormalWorkPredict = new System.Windows.Forms.NumericUpDown();
             this.label20 = new System.Windows.Forms.Label();
             this.label21 = new System.Windows.Forms.Label();
-            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            this.numberOfStdInPredicted = new System.Windows.Forms.NumericUpDown();
             this.label22 = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGV)).BeginInit();
@@ -114,7 +114,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.valuesBeforeFault)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numberOfValuesForNormalWorkPredict)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numberOfStdInPredicted)).BeginInit();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -754,7 +754,7 @@
             // 
             // step5
             // 
-            this.step5.Controls.Add(this.numericUpDown1);
+            this.step5.Controls.Add(this.numberOfStdInPredicted);
             this.step5.Controls.Add(this.label22);
             this.step5.Controls.Add(this.label21);
             this.step5.Controls.Add(this.numberOfValuesForNormalWorkPredict);
@@ -786,10 +786,10 @@
             // 
             // predReliableProgress
             // 
-            this.predReliableProgress.Location = new System.Drawing.Point(384, 358);
+            this.predReliableProgress.Location = new System.Drawing.Point(448, 358);
             this.predReliableProgress.Margin = new System.Windows.Forms.Padding(2);
             this.predReliableProgress.Name = "predReliableProgress";
-            this.predReliableProgress.Size = new System.Drawing.Size(456, 19);
+            this.predReliableProgress.Size = new System.Drawing.Size(392, 19);
             this.predReliableProgress.TabIndex = 18;
             this.predReliableProgress.Visible = false;
             // 
@@ -799,11 +799,11 @@
             this.dataGVPredReliability.AllowUserToDeleteRows = false;
             this.dataGVPredReliability.AllowUserToResizeRows = false;
             this.dataGVPredReliability.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGVPredReliability.Location = new System.Drawing.Point(384, 24);
+            this.dataGVPredReliability.Location = new System.Drawing.Point(448, 24);
             this.dataGVPredReliability.Name = "dataGVPredReliability";
             this.dataGVPredReliability.ReadOnly = true;
             this.dataGVPredReliability.RowHeadersWidth = 51;
-            this.dataGVPredReliability.Size = new System.Drawing.Size(456, 353);
+            this.dataGVPredReliability.Size = new System.Drawing.Size(392, 353);
             this.dataGVPredReliability.TabIndex = 17;
             // 
             // errorProvider1
@@ -901,24 +901,29 @@
             this.label21.TabIndex = 26;
             this.label21.Text = "Количество наблюдений для\r\nподсчета уровня нормальной работы:";
             // 
-            // numericUpDown1
+            // numberOfStdInPredicted
             // 
-            this.numericUpDown1.DecimalPlaces = 1;
-            this.numericUpDown1.Increment = new decimal(new int[] {
+            this.numberOfStdInPredicted.DecimalPlaces = 1;
+            this.numberOfStdInPredicted.Increment = new decimal(new int[] {
             1,
             0,
             0,
             65536});
-            this.numericUpDown1.Location = new System.Drawing.Point(287, 222);
-            this.numericUpDown1.Maximum = new decimal(new int[] {
+            this.numberOfStdInPredicted.Location = new System.Drawing.Point(281, 222);
+            this.numberOfStdInPredicted.Maximum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(120, 20);
-            this.numericUpDown1.TabIndex = 28;
-            this.numericUpDown1.Value = new decimal(new int[] {
+            this.numberOfStdInPredicted.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numberOfStdInPredicted.Name = "numberOfStdInPredicted";
+            this.numberOfStdInPredicted.Size = new System.Drawing.Size(120, 20);
+            this.numberOfStdInPredicted.TabIndex = 28;
+            this.numberOfStdInPredicted.Value = new decimal(new int[] {
             1,
             0,
             0,
@@ -974,7 +979,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.valuesBeforeFault)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numberOfValuesForNormalWorkPredict)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numberOfStdInPredicted)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1049,7 +1054,7 @@
         private System.Windows.Forms.NumericUpDown numberOfValuesForNormalWorkPredict;
         private System.Windows.Forms.Label label20;
         private System.Windows.Forms.Label label21;
-        private System.Windows.Forms.NumericUpDown numericUpDown1;
+        private System.Windows.Forms.NumericUpDown numberOfStdInPredicted;
         private System.Windows.Forms.Label label22;
     }
 }
