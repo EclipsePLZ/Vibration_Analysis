@@ -1007,7 +1007,7 @@ namespace Vibration_Analisys2 {
             workerStep5.ProgressChanged += new ProgressChangedEventHandler(ProgressCalcPredValuesChanged);
             workerStep5.DoWork += new DoWorkEventHandler(FindPredictedValuesReliability);
             workerStep5.WorkerReportsProgress = true;
-            dataGVPredReliability.Size = new Size(392, 329);
+            dataGVPredReliability.Size = new Size(468, 329);
             predReliableProgress.Value = 0;
             predReliableProgress.Visible = true;
             workerStep5.RunWorkerAsync();
@@ -1040,7 +1040,7 @@ namespace Vibration_Analisys2 {
             // Create polynom for predict
             List<double> valuesForPredict = new List<double>(ReferenceFault.GetRange(Convert.ToInt32(numberOfValuesBeforeFault.Text) - countBeforeFault, countBeforeFault + 1));
             List<List<double>> predictPolynom = new List<List<double>>();
-            predictPolynom.Add(OnesList(countBeforeFault));
+            predictPolynom.Add(OnesList(countBeforeFault + 1));
 
             for (int i = 1; i <= Convert.ToInt32(bestPolyDegreeValue.Text); i++) {
                 predictPolynom.Add(PowList(valuesForPredict, i));
@@ -1100,7 +1100,7 @@ namespace Vibration_Analisys2 {
                     realSecond[i], realNumberOfDivisions, predictedSecond[i], predictNumberOfDivisions);
             }
             predReliableProgress.Invoke(new Action<bool>((b) => predReliableProgress.Visible = b), false);
-            dataGVPredReliability.Invoke(new Action<Size>((size) => dataGVPredReliability.Size = size), new Size(392, 353));
+            dataGVPredReliability.Invoke(new Action<Size>((size) => dataGVPredReliability.Size = size), new Size(468, 353));
 
             workerStep5.DoWork -= new DoWorkEventHandler(FindPredictedValuesReliability);
         }
@@ -1144,7 +1144,7 @@ namespace Vibration_Analisys2 {
             string realReliab = (100 - realRel).ToString() + "%";
             string predictReliab = (100 - predictRel).ToString() + "%";
 
-            dataGVPredReliability.Rows.Add(realValue, realReliab, predictValue, predictReliab);
+            dataGVPredReliability.Rows.Add(realValue, realReliab, Math.Round(predictValue, 2), predictReliab);
         }
     }
 }

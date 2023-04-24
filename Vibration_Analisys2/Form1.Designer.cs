@@ -786,10 +786,10 @@
             // 
             // predReliableProgress
             // 
-            this.predReliableProgress.Location = new System.Drawing.Point(448, 358);
+            this.predReliableProgress.Location = new System.Drawing.Point(395, 358);
             this.predReliableProgress.Margin = new System.Windows.Forms.Padding(2);
             this.predReliableProgress.Name = "predReliableProgress";
-            this.predReliableProgress.Size = new System.Drawing.Size(392, 19);
+            this.predReliableProgress.Size = new System.Drawing.Size(468, 19);
             this.predReliableProgress.TabIndex = 18;
             this.predReliableProgress.Visible = false;
             // 
@@ -799,11 +799,11 @@
             this.dataGVPredReliability.AllowUserToDeleteRows = false;
             this.dataGVPredReliability.AllowUserToResizeRows = false;
             this.dataGVPredReliability.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGVPredReliability.Location = new System.Drawing.Point(448, 24);
+            this.dataGVPredReliability.Location = new System.Drawing.Point(395, 24);
             this.dataGVPredReliability.Name = "dataGVPredReliability";
             this.dataGVPredReliability.ReadOnly = true;
             this.dataGVPredReliability.RowHeadersWidth = 51;
-            this.dataGVPredReliability.Size = new System.Drawing.Size(392, 353);
+            this.dataGVPredReliability.Size = new System.Drawing.Size(468, 353);
             this.dataGVPredReliability.TabIndex = 17;
             // 
             // errorProvider1
@@ -909,7 +909,7 @@
             0,
             0,
             65536});
-            this.numberOfStdInPredicted.Location = new System.Drawing.Point(281, 222);
+            this.numberOfStdInPredicted.Location = new System.Drawing.Point(234, 235);
             this.numberOfStdInPredicted.Maximum = new decimal(new int[] {
             1,
             0,
@@ -934,10 +934,10 @@
             this.label22.AutoSize = true;
             this.label22.Location = new System.Drawing.Point(29, 216);
             this.label22.Name = "label22";
-            this.label22.Size = new System.Drawing.Size(246, 26);
+            this.label22.Size = new System.Drawing.Size(196, 39);
             this.label22.TabIndex = 27;
-            this.label22.Text = "Количество стандартных отклонения для\r\nподсчета максимального допустимого уровня:" +
-    "";
+            this.label22.Text = "Количество стандартных отклонения\r\nдля подсчета максимального \r\nдопустимого уровн" +
+    "я:";
             // 
             // MainForm
             // 
