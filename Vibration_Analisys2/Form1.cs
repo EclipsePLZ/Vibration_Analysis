@@ -654,7 +654,7 @@ namespace Vibration_Analisys2 {
             workerStep4.ProgressChanged += new ProgressChangedEventHandler(ProgressFindBestPolyChanged);
             workerStep4.DoWork += new DoWorkEventHandler(FindBestPolynom);
             workerStep4.WorkerReportsProgress = true;
-            dataGVBestPoly.Size = new Size(553, 405);
+            dataGVBestPoly.Size = new Size(415, 329);
             progressBestPoly.Value = 0;
             progressBestPoly.Visible = true;
             workerStep4.RunWorkerAsync();
@@ -1000,6 +1000,7 @@ namespace Vibration_Analisys2 {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void GetPredictedReliability_Click(object sender, EventArgs e) {
+            dataGVPredReliability.ColumnCount = 4;
             SetDataGVColumnHeaders(new List<string>() { "Реальные значения аварии", "Реальные значения надежности", "Предсказанные значения", "Предсказанная надежность" }, dataGVPredReliability, true);
 
             // Run background worker for calc predicted fault values
@@ -1061,6 +1062,14 @@ namespace Vibration_Analisys2 {
             double predictOneDivision = (predictMaxLevel - predictMaxNormLevel) / 99;
             double realOneDivision = (realMaxLevel - realMaxNormLevel) / 99;
 
+            // Number of divisions for values
+            int predictNumberOfDivisions = 0;
+            int realNumberOfDivisions = 0;
+
+            // Keep last biggest signal value
+            double predictPrevBiggestSignal = predictMaxNormLevel;
+            double realPrevBiggestSignal = realMaxNormLevel;
+
             int progress = 0;
             int step = predictedSecond.Count / 100;
             int oneBarInProgress = 1;
@@ -1068,20 +1077,32 @@ namespace Vibration_Analisys2 {
                 step = 1;
                 oneBarInProgress = (100 / predictedSecond.Count) + 1;
             }
+            workerStep5.ReportProgress(progress);
 
-            //int intervalSize = ((int)numberOfValuesForNormalWorkLevel.Value);
-            //double stdCount = ((double)numberOfStdForMaxLevel.Value);
-            //double meanValueForInterval = SecondFault.GetRange(0, intervalSize).Average();
-            //double stdValueForInterval = StandardDeviation(SecondFault.GetRange(0, intervalSize));
-            //MaxNormalVibraitonSignalLevel = meanValueForInterval + (double)stdCount * stdValueForInterval;
+            for (int i = 0; i < predictedSecond.Count; i++) {
+                // Find progress
+                if (i % step == 0) {
+                    progress += oneBarInProgress;
+                    workerStep5.ReportProgress(progress);
+                }
 
-            //meanValueForNormalWork.Text = meanValueForInterval.ToString();
-            //stdValueForNormalWork.Text = stdValueForInterval.ToString();
-            //faultSignal.Text = SecondFault.Max().ToString();
-            //maxVibrationSignal.Text = MaxNormalVibraitonSignalLevel.ToString();
+                if (predictedSecond[i] > predictPrevBiggestSignal) {
+                    predictPrevBiggestSignal = predictedSecond[i];
+                    predictNumberOfDivisions = (int)((predictedSecond[i] - (predictMaxNormLevel)) / predictOneDivision) + 1;
+                }
 
-            //getReliabilityForSecondSignal();
-            //numericPieceOfRefFault.Maximum = ReferenceFault.Count();
+                if (realSecond[i] > realPrevBiggestSignal) {
+                    realPrevBiggestSignal = realSecond[i];
+                    realNumberOfDivisions = (int)((realSecond[i] - (realMaxNormLevel)) / realOneDivision) + 1;
+                }
+
+                dataGVPredReliability.Invoke(new Action<double, int, double, int>((a, b, c, d) => AddRowToDataGVPredictReliability(a, b, c, d)),
+                    realSecond[i], realNumberOfDivisions, predictedSecond[i], predictNumberOfDivisions);
+            }
+            predReliableProgress.Invoke(new Action<bool>((b) => predReliableProgress.Visible = b), false);
+            dataGVPredReliability.Invoke(new Action<Size>((size) => dataGVPredReliability.Size = size), new Size(392, 353));
+
+            workerStep5.DoWork -= new DoWorkEventHandler(FindPredictedValuesReliability);
         }
 
         private void numberOfValuesForNormalWorkPredict_ValueChanged(object sender, EventArgs e) {
@@ -1110,6 +1131,20 @@ namespace Vibration_Analisys2 {
         /// <returns></returns>
         private bool Step5Rule() {
             return numberOfValuesForNormalWorkPredict.Value <= valuesBeforeFault.Value;
+        }
+
+        /// <summary>
+        /// Add next row to dataGridView with predict reliability
+        /// </summary>
+        /// <param name="realValue">Real vibration signal value</param>
+        /// <param name="realRel">Real reliability value</param>
+        /// <param name="predictValue">Predict vibration signal value</param>
+        /// <param name="predictRel">Predict reliability value</param>
+        private void AddRowToDataGVPredictReliability(double realValue, int realRel, double predictValue, int predictRel) {
+            string realReliab = (100 - realRel).ToString() + "%";
+            string predictReliab = (100 - predictRel).ToString() + "%";
+
+            dataGVPredReliability.Rows.Add(realValue, realReliab, predictValue, predictReliab);
         }
     }
 }
