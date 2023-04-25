@@ -94,6 +94,7 @@
             this.label21 = new System.Windows.Forms.Label();
             this.numberOfStdInPredicted = new System.Windows.Forms.NumericUpDown();
             this.label22 = new System.Windows.Forms.Label();
+            this.helpAllSteps = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGV)).BeginInit();
             this.allSteps.SuspendLayout();
@@ -122,10 +123,12 @@
             this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.файлToolStripMenuItem,
-            this.ExitButton});
+            this.ExitButton,
+            this.helpAllSteps});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Padding = new System.Windows.Forms.Padding(4, 2, 0, 2);
+            this.menuStrip1.ShowItemToolTips = true;
             this.menuStrip1.Size = new System.Drawing.Size(898, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
@@ -141,7 +144,7 @@
             // openExcelFile
             // 
             this.openExcelFile.Name = "openExcelFile";
-            this.openExcelFile.Size = new System.Drawing.Size(121, 22);
+            this.openExcelFile.Size = new System.Drawing.Size(180, 22);
             this.openExcelFile.Text = "Открыть";
             this.openExcelFile.Click += new System.EventHandler(this.openExcelFile_Click);
             // 
@@ -215,6 +218,7 @@
             this.allSteps.SelectedIndex = 0;
             this.allSteps.Size = new System.Drawing.Size(887, 432);
             this.allSteps.TabIndex = 6;
+            this.allSteps.Selected += new System.Windows.Forms.TabControlEventHandler(this.allSteps_Selected);
             // 
             // step1
             // 
@@ -939,6 +943,12 @@
             this.label22.Text = "Количество стандартных отклонения\r\nдля подсчета максимального \r\nдопустимого уровн" +
     "я:";
             // 
+            // helpAllSteps
+            // 
+            this.helpAllSteps.Name = "helpAllSteps";
+            this.helpAllSteps.Size = new System.Drawing.Size(68, 20);
+            this.helpAllSteps.Text = "Помощь";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1056,6 +1066,7 @@
         private System.Windows.Forms.Label label21;
         private System.Windows.Forms.NumericUpDown numberOfStdInPredicted;
         private System.Windows.Forms.Label label22;
+        private System.Windows.Forms.ToolStripMenuItem helpAllSteps;
     }
 }
 

@@ -88,6 +88,7 @@ namespace Vibration_Analisys2 {
             maxPolynomDegree.Maximum = Decimal.MaxValue;
             numberOfStdForMaxLevel.Maximum = Decimal.MaxValue;
             numberOfStdInPredicted.Maximum = Decimal.MaxValue;
+            helpAllSteps.ToolTipText = StepsInfo.Step1;
         }
 
         /// <summary>
@@ -122,8 +123,7 @@ namespace Vibration_Analisys2 {
         /// Function for clear controls on step1
         /// </summary>
         private void ClearControlsStep1() {
-            dataGV.Rows.Clear();
-            dataGV.Refresh();
+            ClearDataGVHeaders(dataGV);
             referenceFaultBox.Items.Clear();
             secondFaultBox.Items.Clear();
             ClearControlsStep2();
@@ -139,8 +139,7 @@ namespace Vibration_Analisys2 {
             stdValueForNormalWork.Text = "";
             faultSignal.Text = "";
             maxVibrationSignal.Text = "";
-            dataSignalReliability.Rows.Clear();
-            dataSignalReliability.Refresh();
+            ClearDataGVHeaders(dataSignalReliability);
             ClearControlsStep3();
         }
 
@@ -151,8 +150,7 @@ namespace Vibration_Analisys2 {
             numericPieceOfRefFault.Value = 1;
             bestCorrelCoefTextBox.Text = "";
             bestIndexSecFaultTextBox.Text = "";
-            dataGVbestIntervalsOfFault.Rows.Clear();
-            dataGVbestIntervalsOfFault.Refresh();
+            ClearDataGVHeaders(dataGVbestIntervalsOfFault);
             ClearControlsStep4();
         }
 
@@ -163,10 +161,10 @@ namespace Vibration_Analisys2 {
             numberOfValuesInSelectedInterval.Text = "";
             numberOfValuesForPolynomes.Value = 1;
             maxPolynomDegree.Value = 15;
-            dataGVBestPoly.Rows.Clear();
-            dataGVBestPoly.Refresh();
+            ClearDataGVHeaders(dataGVBestPoly);
             bestPolyDegreeValue.Text = "";
             bestDetermCoeffValue.Text = "";
+            bestEquation.Text = "";
             ClearControlsStep5();
         }
 
@@ -174,10 +172,21 @@ namespace Vibration_Analisys2 {
         /// Function for clear controls on step5
         /// </summary>
         private void ClearControlsStep5() { 
-            dataGVPredReliability.Rows.Clear();
-            dataGVPredReliability.Refresh();
+            ClearDataGVHeaders(dataGVPredReliability);
             numberOfValuesBeforeFault.Text = "";
             valuesBeforeFault.Value = 1;
+            numberOfValuesForNormalWorkPredict.Value = 1;
+            numberOfStdInPredicted.Value = (decimal)1.0;
+        }
+
+        /// <summary>
+        /// Clear headers from dataGridView
+        /// </summary>
+        /// <param name="data">dataGridView</param>
+        private void ClearDataGVHeaders(DataGridView data) {
+            data.Rows.Clear();
+            data.ColumnHeadersVisible = false;
+            data.Refresh();
         }
 
         /// <summary>
@@ -314,7 +323,8 @@ namespace Vibration_Analisys2 {
 
                 // Set maximum values for numeric up down
                 numberOfValuesForNormalWorkLevel.Maximum = SecondFault.Count;
-                
+
+                ClearControlsStep2();
 
                 allSteps.SelectTab(step2);
             }
@@ -409,6 +419,7 @@ namespace Vibration_Analisys2 {
 
             getReliabilityForSecondSignal();
             numericPieceOfRefFault.Maximum = ReferenceFault.Count();
+            ClearControlsStep3();
             step3.Enabled = true;
         }
 
@@ -546,6 +557,7 @@ namespace Vibration_Analisys2 {
             SelectIntervalSecFault = new List<double>(SecondFault.GetRange(bestStartIndexSecFault, SecondFault.Count - bestStartIndexSecFault));
 
             WriteBestIntervalsIntoDataGridView();
+            ClearControlsStep4();
             step4.Enabled = true;
 
             numberOfValuesInSelectedInterval.Text = SelectIntervalSecFault.Count.ToString();
@@ -659,11 +671,13 @@ namespace Vibration_Analisys2 {
             progressBestPoly.Visible = true;
             workerStep4.RunWorkerAsync();
 
+            ClearControlsStep5();
             step5.Enabled = true;
 
             int valuesCountBeforeFault = ReferenceFault.IndexOf(ReferenceFault.Max());
             numberOfValuesBeforeFault.Text = valuesCountBeforeFault.ToString();
             valuesBeforeFault.Maximum = valuesCountBeforeFault;
+            valuesBeforeFault.Value = valuesCountBeforeFault;
             numberOfValuesForNormalWorkPredict.Maximum = valuesCountBeforeFault;
         }
 
@@ -983,6 +997,8 @@ namespace Vibration_Analisys2 {
                     dataGV.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                 }
             }
+
+            dataGV.ColumnHeadersVisible = true;
         }
 
         /// <summary>
@@ -1145,6 +1161,35 @@ namespace Vibration_Analisys2 {
             string predictReliab = (100 - predictRel).ToString() + "%";
 
             dataGVPredReliability.Rows.Add(realValue, realReliab, Math.Round(predictValue, 2), predictReliab);
+        }
+
+        /// <summary>
+        /// Change information text about step
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void allSteps_Selected(object sender, TabControlEventArgs e) {
+            switch (allSteps.SelectedIndex) {
+                case 0:
+                    helpAllSteps.ToolTipText = StepsInfo.Step1;
+                    break;
+
+                case 1:
+                    helpAllSteps.ToolTipText = StepsInfo.Step2;
+                    break;
+
+                case 2:
+                    helpAllSteps.ToolTipText = StepsInfo.Step3;
+                    break;
+
+                case 3:
+                    helpAllSteps.ToolTipText = StepsInfo.Step4;
+                    break;
+
+                case 4:
+                    helpAllSteps.ToolTipText = StepsInfo.Step5;
+                    break;
+            }
         }
     }
 }
