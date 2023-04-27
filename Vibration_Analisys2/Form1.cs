@@ -132,13 +132,14 @@ namespace Vibration_Analisys2 {
         /// <summary>
         /// Function for clear controls on step2
         /// </summary>
-        private void ClearControlsStep2() {
+        private void ClearControlsStep2() {            
             numberOfValuesForNormalWorkLevel.Value = 1;
             numberOfStdForMaxLevel.Value = 1;
-            meanValueForNormalWork.Text = "";
-            stdValueForNormalWork.Text = "";
-            faultSignal.Text = "";
-            maxVibrationSignal.Text = "";
+            allValuesInFaults.Clear();
+            meanValueForNormalWork.Clear();
+            stdValueForNormalWork.Clear();
+            faultSignal.Clear();
+            maxVibrationSignal.Clear();
             ClearDataGVHeaders(dataSignalReliability);
             ClearControlsStep3();
         }
@@ -148,8 +149,9 @@ namespace Vibration_Analisys2 {
         /// </summary>
         private void ClearControlsStep3() {
             numericPieceOfRefFault.Value = 1;
-            bestCorrelCoefTextBox.Text = "";
-            bestIndexSecFaultTextBox.Text = "";
+            bestCorrelCoefTextBox.Clear();
+            bestIndexSecFaultTextBox.Clear();
+            numValuesInRefFault.Clear();
             ClearDataGVHeaders(dataGVbestIntervalsOfFault);
             ClearControlsStep4();
         }
@@ -158,13 +160,13 @@ namespace Vibration_Analisys2 {
         /// Function for clear controls on step4
         /// </summary>
         private void ClearControlsStep4() {
-            numberOfValuesInSelectedInterval.Text = "";
+            numberOfValuesInSelectedInterval.Clear();
             numberOfValuesForPolynomes.Value = 1;
             maxPolynomDegree.Value = 15;
             ClearDataGVHeaders(dataGVBestPoly);
-            bestPolyDegreeValue.Text = "";
-            bestDetermCoeffValue.Text = "";
-            bestEquation.Text = "";
+            bestPolyDegreeValue.Clear();
+            bestDetermCoeffValue.Clear();
+            bestEquation.Clear();
             ClearControlsStep5();
         }
 
@@ -173,7 +175,7 @@ namespace Vibration_Analisys2 {
         /// </summary>
         private void ClearControlsStep5() { 
             ClearDataGVHeaders(dataGVPredReliability);
-            numberOfValuesBeforeFault.Text = "";
+            numberOfValuesBeforeFault.Clear();
             valuesBeforeFault.Value = 1;
             numberOfValuesForNormalWorkPredict.Value = 1;
             numberOfStdInPredicted.Value = (decimal)1.0;
@@ -316,15 +318,18 @@ namespace Vibration_Analisys2 {
             try {
                 // Create second and reference fault lists
                 for (int rowNumber = 1; rowNumber < dataGV.Rows.Count; rowNumber++) {
-                    ReferenceFault.Add(Convert.ToDouble(dataGV[ReferenceFaultHeader.Item2, rowNumber].Value));
-                    SecondFault.Add(Convert.ToDouble(dataGV[SecondFaultHeader.Item2, rowNumber].Value));
+                    try {
+                        ReferenceFault.Add(Convert.ToDouble(dataGV[ReferenceFaultHeader.Item2, rowNumber].Value));
+                        SecondFault.Add(Convert.ToDouble(dataGV[SecondFaultHeader.Item2, rowNumber].Value));
+                    }
+                    catch { }
                 }
+                ClearControlsStep2();
+
                 step2.Enabled = true;
 
-                // Set maximum values for numeric up down
                 numberOfValuesForNormalWorkLevel.Maximum = SecondFault.Count;
-
-                ClearControlsStep2();
+                allValuesInFaults.Text = Math.Min(ReferenceFault.Count, SecondFault.Count).ToString();
 
                 allSteps.SelectTab(step2);
             }
@@ -407,6 +412,10 @@ namespace Vibration_Analisys2 {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void calcReliabilitySignal_Click(object sender, EventArgs e) {
+            // Очищаем dataGridView
+            dataSignalReliability.Rows.Clear();
+            dataSignalReliability.Refresh();
+
             int intervalSize = ((int)numberOfValuesForNormalWorkLevel.Value);
             double meanValueForInterval = SecondFault.GetRange(0, intervalSize).Average();
             double stdValueForInterval = StandardDeviation(SecondFault.GetRange(0, intervalSize));
@@ -418,8 +427,12 @@ namespace Vibration_Analisys2 {
             maxVibrationSignal.Text = MaxNormalVibraitonSignalLevel.ToString();
 
             getReliabilityForSecondSignal();
-            numericPieceOfRefFault.Maximum = ReferenceFault.Count();
+
             ClearControlsStep3();
+
+            numericPieceOfRefFault.Maximum = ReferenceFault.Count();
+            numValuesInRefFault.Text = ReferenceFault.Count.ToString();
+
             step3.Enabled = true;
         }
 
@@ -536,19 +549,50 @@ namespace Vibration_Analisys2 {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void maxPearsonCoefTwoFaultsButton_Click(object sender, EventArgs e) {
+            // Очистить dataGridView
+            dataGVbestIntervalsOfFault.Rows.Clear();
+            dataGVbestIntervalsOfFault.Refresh();
+
+            findBestIntervalBar.Value = 0;
+            findBestIntervalBar.Visible = true;
+
             int numberOfValuesInFault = (int)numericPieceOfRefFault.Value;
 
             SelectIntervalRefFault = new List<double>(ReferenceFault.GetRange(0, numberOfValuesInFault));
             double bestCorrCoef = 0;
             int bestStartIndexSecFault = 0;
 
+            int progress = 0;
+            int step = (SecondFault.Count - numberOfValuesInFault) / 100;
+            int oneBarInProgress = 1;
+            if ((SecondFault.Count - numberOfValuesInFault) < 100) {
+                step = 1;
+                if (SecondFault.Count == numberOfValuesInFault) {
+                    oneBarInProgress = 100;
+                }
+                else {
+                    oneBarInProgress = (100 / (SecondFault.Count - numberOfValuesInFault)) + 1;
+                }
+            }
+
             for (int i = 0; i < (SecondFault.Count - numberOfValuesInFault); i++) {
+                // Find progress
+                if (i % step == 0) {
+                    progress += oneBarInProgress;
+                    if (progress > 100) {
+                        progress = 100;
+                    }
+                    findBestIntervalBar.Value = progress;
+                }
+
                 double corrCoef = CorrelCoef(SelectIntervalRefFault, SecondFault.GetRange(i, numberOfValuesInFault));
                 if (Math.Abs(corrCoef) > Math.Abs(bestCorrCoef)) {
                     bestCorrCoef = corrCoef;
                     bestStartIndexSecFault = i;
                 }
             }
+
+            findBestIntervalBar.Visible = false;
 
             bestCorrelCoefTextBox.Text = bestCorrCoef.ToString();
             bestIndexSecFaultTextBox.Text = (bestStartIndexSecFault + 1).ToString();
@@ -656,6 +700,10 @@ namespace Vibration_Analisys2 {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void FindPolynomButton_Click(object sender, EventArgs e) {
+            // Очистить dataGridView
+            dataGVBestPoly.Rows.Clear();
+            dataGVBestPoly.Refresh();
+
             dataGVBestPoly.ColumnCount = 3;
 
             SetDataGVColumnHeaders(new List<string>() { "Степень полинома", "Коэффициент детерминации", "Уравнение" }, dataGVBestPoly, true);
@@ -674,7 +722,7 @@ namespace Vibration_Analisys2 {
             ClearControlsStep5();
             step5.Enabled = true;
 
-            int valuesCountBeforeFault = ReferenceFault.IndexOf(ReferenceFault.Max());
+            int valuesCountBeforeFault = Math.Min(ReferenceFault.IndexOf(ReferenceFault.Max()), SecondFault.IndexOf(SecondFault.Max()));
             numberOfValuesBeforeFault.Text = valuesCountBeforeFault.ToString();
             valuesBeforeFault.Maximum = valuesCountBeforeFault;
             valuesBeforeFault.Value = valuesCountBeforeFault;
@@ -743,7 +791,7 @@ namespace Vibration_Analisys2 {
 
             bestPolyDegreeValue.Invoke(new Action<string>((s) => bestPolyDegreeValue.Text = s), bestPolynomialDegree.ToString());
             bestDetermCoeffValue.Invoke(new Action<string>((s) => bestDetermCoeffValue.Text = s), bestDetermCoef.ToString());
-            bestEquation.Invoke(new Action<string>((s) => bestEquation.Text = s), dataGVBestPoly[2, bestPolynomialDegree + 1].Value);
+            bestEquation.Invoke(new Action<string>((s) => bestEquation.Text = s), dataGVBestPoly[2, bestPolynomialDegree - 1].Value);
 
             progressBestPoly.Invoke(new Action<bool>((b) => progressBestPoly.Visible = b), false);
             dataGVBestPoly.Invoke(new Action<Size>((size) => dataGVBestPoly.Size = size), new Size(415, 354));
@@ -1016,6 +1064,10 @@ namespace Vibration_Analisys2 {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void GetPredictedReliability_Click(object sender, EventArgs e) {
+            // Очистить dataGridView
+            dataGVPredReliability.Rows.Clear();
+            dataGVPredReliability.Refresh();
+
             dataGVPredReliability.ColumnCount = 4;
             SetDataGVColumnHeaders(new List<string>() { "Реальные значения аварии", "Реальные значения надежности", "Предсказанные значения", "Предсказанная надежность" }, dataGVPredReliability, true);
 

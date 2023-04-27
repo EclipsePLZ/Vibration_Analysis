@@ -95,6 +95,11 @@
             this.numberOfStdInPredicted = new System.Windows.Forms.NumericUpDown();
             this.label22 = new System.Windows.Forms.Label();
             this.helpAllSteps = new System.Windows.Forms.ToolStripMenuItem();
+            this.label23 = new System.Windows.Forms.Label();
+            this.allValuesInFaults = new System.Windows.Forms.TextBox();
+            this.label24 = new System.Windows.Forms.Label();
+            this.numValuesInRefFault = new System.Windows.Forms.TextBox();
+            this.findBestIntervalBar = new System.Windows.Forms.ProgressBar();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGV)).BeginInit();
             this.allSteps.SuspendLayout();
@@ -260,6 +265,8 @@
             // 
             // step2
             // 
+            this.step2.Controls.Add(this.label23);
+            this.step2.Controls.Add(this.allValuesInFaults);
             this.step2.Controls.Add(this.label8);
             this.step2.Controls.Add(this.faultSignal);
             this.step2.Controls.Add(this.progressBarReliability);
@@ -419,7 +426,7 @@
             // 
             // numberOfValuesForNormalWorkLevel
             // 
-            this.numberOfValuesForNormalWorkLevel.Location = new System.Drawing.Point(286, 34);
+            this.numberOfValuesForNormalWorkLevel.Location = new System.Drawing.Point(286, 60);
             this.numberOfValuesForNormalWorkLevel.Maximum = new decimal(new int[] {
             1,
             0,
@@ -443,7 +450,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(28, 28);
+            this.label3.Location = new System.Drawing.Point(28, 54);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(199, 26);
             this.label3.TabIndex = 2;
@@ -451,6 +458,9 @@
             // 
             // step3
             // 
+            this.step3.Controls.Add(this.findBestIntervalBar);
+            this.step3.Controls.Add(this.label24);
+            this.step3.Controls.Add(this.numValuesInRefFault);
             this.step3.Controls.Add(this.progressBarSelectedInterval);
             this.step3.Controls.Add(this.dataGVbestIntervalsOfFault);
             this.step3.Controls.Add(this.label11);
@@ -493,7 +503,7 @@
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(55, 194);
+            this.label11.Location = new System.Drawing.Point(55, 214);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(202, 26);
             this.label11.TabIndex = 11;
@@ -501,7 +511,7 @@
             // 
             // bestIndexSecFaultTextBox
             // 
-            this.bestIndexSecFaultTextBox.Location = new System.Drawing.Point(272, 200);
+            this.bestIndexSecFaultTextBox.Location = new System.Drawing.Point(272, 220);
             this.bestIndexSecFaultTextBox.Name = "bestIndexSecFaultTextBox";
             this.bestIndexSecFaultTextBox.ReadOnly = true;
             this.bestIndexSecFaultTextBox.Size = new System.Drawing.Size(100, 20);
@@ -510,7 +520,7 @@
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(55, 132);
+            this.label10.Location = new System.Drawing.Point(55, 152);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(211, 26);
             this.label10.TabIndex = 9;
@@ -518,7 +528,7 @@
             // 
             // bestCorrelCoefTextBox
             // 
-            this.bestCorrelCoefTextBox.Location = new System.Drawing.Point(272, 138);
+            this.bestCorrelCoefTextBox.Location = new System.Drawing.Point(272, 158);
             this.bestCorrelCoefTextBox.Name = "bestCorrelCoefTextBox";
             this.bestCorrelCoefTextBox.ReadOnly = true;
             this.bestCorrelCoefTextBox.Size = new System.Drawing.Size(100, 20);
@@ -526,7 +536,7 @@
             // 
             // numericPieceOfRefFault
             // 
-            this.numericPieceOfRefFault.Location = new System.Drawing.Point(252, 44);
+            this.numericPieceOfRefFault.Location = new System.Drawing.Point(252, 87);
             this.numericPieceOfRefFault.Maximum = new decimal(new int[] {
             1,
             0,
@@ -561,7 +571,7 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(55, 46);
+            this.label9.Location = new System.Drawing.Point(55, 89);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(191, 13);
             this.label9.TabIndex = 1;
@@ -699,7 +709,7 @@
             // FindPolynomButton
             // 
             this.FindPolynomButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.FindPolynomButton.Location = new System.Drawing.Point(95, 319);
+            this.FindPolynomButton.Location = new System.Drawing.Point(110, 319);
             this.FindPolynomButton.Name = "FindPolynomButton";
             this.FindPolynomButton.Size = new System.Drawing.Size(154, 59);
             this.FindPolynomButton.TabIndex = 14;
@@ -744,9 +754,9 @@
             this.label12.AutoSize = true;
             this.label12.Location = new System.Drawing.Point(52, 24);
             this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(125, 26);
+            this.label12.Size = new System.Drawing.Size(140, 26);
             this.label12.TabIndex = 11;
-            this.label12.Text = "Количество значений в\r\nвыбранных авариях:";
+            this.label12.Text = "Количество наблюдений в\r\nвыбранных авариях:";
             // 
             // numberOfValuesInSelectedInterval
             // 
@@ -949,6 +959,49 @@
             this.helpAllSteps.Size = new System.Drawing.Size(68, 20);
             this.helpAllSteps.Text = "Помощь";
             // 
+            // label23
+            // 
+            this.label23.AutoSize = true;
+            this.label23.Location = new System.Drawing.Point(31, 16);
+            this.label23.Name = "label23";
+            this.label23.Size = new System.Drawing.Size(140, 26);
+            this.label23.TabIndex = 18;
+            this.label23.Text = "Количество наблюдений в\r\nвыбранных авариях:";
+            // 
+            // allValuesInFaults
+            // 
+            this.allValuesInFaults.Location = new System.Drawing.Point(177, 22);
+            this.allValuesInFaults.Name = "allValuesInFaults";
+            this.allValuesInFaults.ReadOnly = true;
+            this.allValuesInFaults.Size = new System.Drawing.Size(100, 20);
+            this.allValuesInFaults.TabIndex = 17;
+            // 
+            // label24
+            // 
+            this.label24.AutoSize = true;
+            this.label24.Location = new System.Drawing.Point(55, 19);
+            this.label24.Name = "label24";
+            this.label24.Size = new System.Drawing.Size(140, 26);
+            this.label24.TabIndex = 20;
+            this.label24.Text = "Количество наблюдений в\r\nэталонной аварии:";
+            // 
+            // numValuesInRefFault
+            // 
+            this.numValuesInRefFault.Location = new System.Drawing.Point(201, 25);
+            this.numValuesInRefFault.Name = "numValuesInRefFault";
+            this.numValuesInRefFault.ReadOnly = true;
+            this.numValuesInRefFault.Size = new System.Drawing.Size(100, 20);
+            this.numValuesInRefFault.TabIndex = 19;
+            // 
+            // findBestIntervalBar
+            // 
+            this.findBestIntervalBar.Location = new System.Drawing.Point(69, 358);
+            this.findBestIntervalBar.Margin = new System.Windows.Forms.Padding(2);
+            this.findBestIntervalBar.Name = "findBestIntervalBar";
+            this.findBestIntervalBar.Size = new System.Drawing.Size(341, 19);
+            this.findBestIntervalBar.TabIndex = 21;
+            this.findBestIntervalBar.Visible = false;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1067,6 +1120,11 @@
         private System.Windows.Forms.NumericUpDown numberOfStdInPredicted;
         private System.Windows.Forms.Label label22;
         private System.Windows.Forms.ToolStripMenuItem helpAllSteps;
+        private System.Windows.Forms.Label label23;
+        private System.Windows.Forms.TextBox allValuesInFaults;
+        private System.Windows.Forms.Label label24;
+        private System.Windows.Forms.TextBox numValuesInRefFault;
+        private System.Windows.Forms.ProgressBar findBestIntervalBar;
     }
 }
 
